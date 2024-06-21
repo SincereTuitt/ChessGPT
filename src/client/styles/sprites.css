@@ -1,0 +1,71 @@
+.bg-pb {
+  background: url('../assets/css_sprites.png');
+  background-position: 0 0;
+  background-size: auto 100%;
+}
+
+.bg-pw {
+  background: url('../assets/css_sprites.png');
+  background-position: calc(-100%) 0;
+  background-size: auto 100%;
+}
+
+.bg-bw {
+  background: url('../assets/css_sprites.png');
+  background-position: calc(-200%) 0;
+  background-size: auto 100%;
+}
+
+.bg-kb {
+  background: url('../assets/css_sprites.png'); 
+  background-position: calc(-300%) 0;
+  background-size: auto 100%;
+}
+
+.bg-qw {
+  background: url('../assets/css_sprites.png');
+  background-position: calc(-400%) 0;
+  background-size: auto 100%;
+}
+
+.bg-qb {
+  background: url('../assets/css_sprites.png');
+  background-position: calc(-500%) 0;
+  background-size: auto 100%;
+}
+
+.bg-nw {
+  background: url('../assets/css_sprites.png');
+  background-position: calc(-600%) 0;
+  background-size: auto 100%;
+}
+
+.bg-bb {
+  background: url('../assets/css_sprites.png');
+  background-position: calc(-700%) 0;
+  background-size: auto 100%;
+}
+
+.bg-rb {
+  background: url('../assets/css_sprites.png');
+  background-position: calc(-800%) 0;
+  background-size: auto 100%;
+}
+
+.bg-nb {
+  background: url('../assets/css_sprites.png');
+  background-position: calc(-900%) 0;
+  background-size: auto 100%;
+}
+
+.bg-kw {
+  background: url('../assets/css_sprites.png');
+  background-position: calc(-1000%) 0;
+  background-size: auto 100%;
+}
+
+.bg-rw {
+  background: url('../assets/css_sprites.png');
+  background-position: calc(-1100%) 0;
+  background-size: auto 100%;
+}

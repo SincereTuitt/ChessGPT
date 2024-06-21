@@ -1,0 +1,32 @@
+#settings {
+  width: 200px;
+  height: 300px;
+  padding-left: 10px;
+  border-radius: 5%;
+  overflow: hidden;
+}
+
+#settingsHeader {
+  text-align: center;
+  color: white;
+  margin-left: -10px;
+  padding-top: 0;
+}
+
+#settings h3 {
+  margin: 0;
+}
+
+.settingSelected {
+  background-color: black;
+  height: 15px;
+  width: 15px;
+  border-radius: 100%;
+}
+
+.settingNotSelected {
+  background-color: white;
+  height: 15px;
+  width: 15px;
+  border-radius: 100%;
+}
