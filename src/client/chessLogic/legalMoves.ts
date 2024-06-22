@@ -28,8 +28,8 @@ export function rookMoves(
   currentPlayer: player
 ): moves {
   const output: moves = { moves: [], captures: [] }
-  const row = selectedSquare[0];
-  const column = selectedSquare[1];
+  const row: number = selectedSquare[0];
+  const column: number = selectedSquare[1];
 
   // get row moves
   for (let i = row + 1, j = column; i < 8; i++) {
@@ -41,7 +41,7 @@ export function rookMoves(
       break;
     }
   }
-  for (let i = row - 1, j = column; i > 0; i--) {
+  for (let i = row - 1, j = column; i >= 0; i--) {
     const square: piece = boardState[i][j];
     if (square === '-') output.moves.push([i, j]);
     else if (square[1] === currentPlayer) break;
@@ -61,7 +61,7 @@ export function rookMoves(
       break;
     }
   }
-  for (let i = row, j = column - 1; j > 0; j--) {
+  for (let i = row, j = column - 1; j >= 0; j--) {
     const square: piece = boardState[i][j];
     if (square === '-') output.moves.push([i, j]);
     else if (square[1] === currentPlayer) break;
@@ -97,6 +97,45 @@ export function bishopMoves(
   currentPlayer: player
 ): moves {
   const output: moves = { moves: [], captures: [] }
+  const row: number = selectedSquare[0];
+  const column: number = selectedSquare[1];
+
+  for (let i = row + 1, j = column + 1; i < 8 && j < 8; i++, j++) {
+    const square: piece = boardState[i][j];
+    if (square === '-') output.moves.push([i, j]);
+    else if (square[1] === currentPlayer) break;
+    else {
+      output.captures.push([i, j]);
+      break;
+    }
+  }
+  for (let i = row + 1, j = column - 1; i < 8 && j >= 0; i++, j--) {
+    const square: piece = boardState[i][j];
+    if (square === '-') output.moves.push([i, j]);
+    else if (square[1] === currentPlayer) break;
+    else {
+      output.captures.push([i, j]);
+      break;
+    }
+  }
+  for (let i = row - 1, j = column + 1; i >= 0 && j < 8; i--, j++) {
+    const square: piece = boardState[i][j];
+    if (square === '-') output.moves.push([i, j]);
+    else if (square[1] === currentPlayer) break;
+    else {
+      output.captures.push([i, j]);
+      break;
+    }
+  }
+  for (let i = row - 1, j = column - 1; i >= 0 && j >= 0; i--, j++) {
+    const square: piece = boardState[i][j];
+    if (square === '-') output.moves.push([i, j]);
+    else if (square[1] === currentPlayer) break;
+    else {
+      output.captures.push([i, j]);
+      break;
+    }
+  }
   return output;
 }
 
@@ -105,8 +144,12 @@ export function queenMoves(
   selectedSquare: coordinate,
   currentPlayer: player
 ): moves {
-  const output: moves = { moves: [], captures: [] }
-  return output;
+  const diagnolMoves: moves = bishopMoves(boardState, selectedSquare, currentPlayer);
+  const straightMoves: moves = rookMoves(boardState, selectedSquare, currentPlayer);
+  return {
+    moves: diagnolMoves.moves.concat(straightMoves.moves),
+    captures: diagnolMoves.captures.concat(straightMoves.captures),
+  };
 }
 
 export function kingMoves(

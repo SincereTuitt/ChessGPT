@@ -85,36 +85,36 @@ describe ('rookMoves', (): void => {
 
   })
 }) 
-xdescribe ('queenMoves', (): void => {
+describe ('queenMoves', (): void => {
   const board = JSON.parse(JSON.stringify(emptyBoard));
-  board[0][0] = 'qw';
-  board[0][1] = 'nw';
-  board[1][0] = 'nw';
-  board[1][1] = 'nw';
   it('should return an empty moves object when the queen is trapped', (): void => {
+    board[0][0] = 'qw';
+    board[0][1] = 'nw';
+    board[1][0] = 'nw';
+    board[1][1] = 'nw';
     const emptyMoves = queenMoves(board, [0, 0], 'w');
     expect(emptyMoves.moves).toHaveLength(0);
     expect(emptyMoves.captures).toHaveLength(0);
   })
-  board[0][1] = '-';
-  board[1][0] = '-';
-  board[1][1] = '-';
   it('should return all of the squares the queen can move to', (): void => {
+    board[0][1] = '-';
+    board[1][0] = '-';
+    board[1][1] = '-';
     const moves = queenMoves(board, [0, 0], 'w');
     expect(moves.moves).toHaveLength(21);
     expect(moves.captures).toHaveLength(0);
   })
-  board[0][5] = 'bb';
-  board[7][0] = 'rb';
-  board[2][2] = 'rb';
   it('should return all of the squares the queen can capture', (): void => {
+    board[0][5] = 'bb';
+    board[7][0] = 'rb';
+    board[2][2] = 'rb';
     const moves = queenMoves(board, [0, 0], 'w');
     expect(moves.moves).toHaveLength(11);
     expect(moves.captures).toHaveLength(3);
     
   })
-  board[2][2] = 'rw';
   it('should not allow the queen to capture its own pieces', (): void => {
+    board[2][2] = 'rw';
     const moves = queenMoves(board, [0, 0], 'w');
     expect(moves.moves).toHaveLength(11);
     expect(moves.captures).toHaveLength(2);
@@ -155,33 +155,33 @@ xdescribe ('knightMoves', (): void => {
 
   })
 }) 
-xdescribe ('bishopMoves', (): void => {
+describe ('bishopMoves', (): void => {
   const board = JSON.parse(JSON.stringify(emptyBoard));
-  board[0][0] = 'bw';
-  board[1][1] = 'nw';
   it('should return an empty moves object when the bishop is trapped', (): void => {
+    board[0][0] = 'bw';
+    board[1][1] = 'nw';
     const emptyMoves = bishopMoves(board, [0, 0], 'w');
     expect(emptyMoves.moves).toHaveLength(0);
     expect(emptyMoves.captures).toHaveLength(0);
   })
-  board[0][0] = '-';
-  board[0][0] = '-';
-  board[3][3] = 'bw'
   it('should return all of the squares the bishop can move to', (): void => {
+    board[0][0] = '-';
+    board[1][1] = '-';
+    board[3][3] = 'bw'
     const moves = bishopMoves(board, [3, 3], 'w');
     expect(moves.moves).toHaveLength(13);
     expect(moves.captures).toHaveLength(0);
   })
-  board[2][2] = 'bb';
-  board[5][1] = 'rb';
   it('should return all of the squares the bishop can capture', (): void => {
+    board[2][2] = 'bb';
+    board[5][1] = 'rb';
     const moves = bishopMoves(board, [3, 3], 'w');
     expect(moves.moves).toHaveLength(8);
     expect(moves.captures).toHaveLength(2);
     
   })
-  board[4][4] = 'rw';
   it('should not allow the bishop to capture its own pieces', (): void => {
+    board[4][4] = 'rw';
     const moves = bishopMoves(board, [3, 3], 'w');
     expect(moves.moves).toHaveLength(4);
     expect(moves.captures).toHaveLength(2);
