@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function getMoves(boardState, selectedSquare, currentPlayer, pawnJumpPrevious) {
+function getMoves(boardState, selectedSquare, currentPlayer, pawnJumpPrevious, movedCastlers) {
     const selectedPiece = boardState[selectedSquare[0]][selectedSquare[1]];
     let output = { moves: [], captures: [] };
     if (selectedPiece === '-' || selectedPiece[1] !== currentPlayer)
@@ -19,7 +19,7 @@ function getMoves(boardState, selectedSquare, currentPlayer, pawnJumpPrevious) {
             output = queenMoves(boardState, selectedSquare, currentPlayer);
             break;
         case 'k':
-            output = kingMoves(boardState, selectedSquare, currentPlayer);
+            output = kingMoves(boardState, selectedSquare, currentPlayer, movedCastlers);
             break;
         case 'p':
             output = pawnMoves(boardState, selectedSquare, currentPlayer, pawnJumpPrevious);
@@ -28,7 +28,7 @@ function getMoves(boardState, selectedSquare, currentPlayer, pawnJumpPrevious) {
             break;
     }
     output.moves = output.moves.filter((move) => {
-        const updatedBoard = updateBoard(boardState, selectedSquare, move);
+        const updatedBoard = updateBoard(boardState, selectedSquare, move, currentPlayer);
         return !isInCheck(updatedBoard, currentPlayer);
     });
     return output;
@@ -90,19 +90,56 @@ function isInCheck(boardState, currentPlayer) {
     return false;
 }
 exports.isInCheck = isInCheck;
-function updateBoard(currentBoard, [previousRow, previousColumn], [nextRow, nextColumn]) {
+function updateBoard(currentBoard, [previousRow, previousColumn], [nextRow, nextColumn], currentPlayer) {
     const newBoard = JSON.parse(JSON.stringify(currentBoard));
-    const currentPlayer = currentBoard[previousRow][previousColumn][1];
     const currentPiece = currentBoard[previousRow][previousColumn][0];
     if (currentPiece === 'p'
         && currentBoard[nextRow][nextColumn] === '-'
         && previousColumn !== nextColumn)
         newBoard[currentPlayer === 'w' ? nextRow - 1 : nextRow + 1][nextColumn] = '-';
+    if (currentPiece === 'k'
+        && previousColumn === 4
+        && nextColumn === 6) {
+        newBoard[previousRow][7] = '-';
+        newBoard[previousRow][5] = `r${currentPlayer}`;
+    }
+    if (currentPiece === 'k'
+        && previousColumn === 4
+        && nextColumn === 2) {
+        newBoard[previousRow][0] = '-';
+        newBoard[previousRow][3] = `r${currentPlayer}`;
+    }
     newBoard[nextRow][nextColumn] = currentBoard[previousRow][previousColumn];
     newBoard[previousRow][previousColumn] = '-';
     return newBoard;
 }
 exports.updateBoard = updateBoard;
+function updateCastlingOptions(previousCastlers, boardState, previousSquare, nextSquare, currentPlayer) {
+    const newMovedCastlers = Object.assign({}, previousCastlers);
+    const currentPiece = boardState[previousSquare[0]][previousSquare[1]];
+    const capturedPiece = boardState[nextSquare[0]][nextSquare[1]];
+    const opponent = currentPlayer === 'w' ? 'b' : 'w';
+    if (currentPiece[0] === 'k')
+        newMovedCastlers[`k${currentPlayer}`] = true;
+    if (currentPiece[0] === 'r'
+        && previousSquare[0] === (currentPlayer === 'w' ? 0 : 7)
+        && previousSquare[1] === 0)
+        newMovedCastlers[`r${currentPlayer}0`] = true;
+    if (currentPiece[0] === 'r'
+        && previousSquare[0] === (currentPlayer === 'w' ? 0 : 7)
+        && previousSquare[1] === 7)
+        newMovedCastlers[`r${currentPlayer}7`] = true;
+    if (capturedPiece[0] === 'r'
+        && nextSquare[0] === (currentPlayer === 'w' ? 7 : 0)
+        && nextSquare[1] === 7)
+        newMovedCastlers[`r${opponent}7`] = true;
+    if (capturedPiece[0] === 'r'
+        && nextSquare[0] === (currentPlayer === 'w' ? 7 : 0)
+        && nextSquare[1] === 0)
+        newMovedCastlers[`r${opponent}0`] = true;
+    return newMovedCastlers;
+}
+exports.updateCastlingOptions = updateCastlingOptions;
 function rookMoves(boardState, selectedSquare, currentPlayer) {
     const output = { moves: [], captures: [] };
     const row = selectedSquare[0];
@@ -300,7 +337,7 @@ function queenMoves(boardState, selectedSquare, currentPlayer) {
     };
 }
 exports.queenMoves = queenMoves;
-function kingMoves(boardState, selectedSquare, currentPlayer) {
+function kingMoves(boardState, selectedSquare, currentPlayer, movedCastlers) {
     const output = { moves: [], captures: [] };
     const row = selectedSquare[0];
     const column = selectedSquare[1];
@@ -325,6 +362,24 @@ function kingMoves(boardState, selectedSquare, currentPlayer) {
         else if (square[1] !== currentPlayer)
             output.captures.push([i, j]);
     });
+    if (movedCastlers && !movedCastlers['k' + currentPlayer] && !isInCheck(boardState, currentPlayer)) {
+        const boardClone = JSON.parse(JSON.stringify(boardState));
+        boardClone[row][column] = '-';
+        boardClone[row][5] = `k${currentPlayer}`;
+        if (!movedCastlers['r' + currentPlayer + '7']
+            && boardState[row][5] === '-'
+            && boardState[row][6] === '-'
+            && !isInCheck(boardClone, currentPlayer))
+            output.moves.push([row, 6]);
+        boardClone[row][5] = '-';
+        boardClone[row][3] = `k${currentPlayer}`;
+        if (!movedCastlers['r' + currentPlayer + '0']
+            && boardState[row][1] === '-'
+            && boardState[row][2] === '-'
+            && boardState[row][3] === '-'
+            && !isInCheck(boardClone, currentPlayer))
+            output.moves.push([row, 2]);
+    }
     return output;
 }
 exports.kingMoves = kingMoves;

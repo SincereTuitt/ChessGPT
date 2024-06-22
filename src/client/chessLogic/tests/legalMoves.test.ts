@@ -1,6 +1,5 @@
-import { rookMoves, knightMoves, bishopMoves, kingMoves, queenMoves, pawnMoves, getMoves, isInCheck, updateBoard } from "../legalMoves";
+import { rookMoves, knightMoves, bishopMoves, kingMoves, queenMoves, pawnMoves, getMoves, isInCheck, updateBoard, updateCastlingOptions } from "../legalMoves.ts";
 import { board, coordinate, moves, piece, player } from '../types';
-
 
 const initialBoard: board = [
   ['rw', 'nw', 'bw', 'qw', 'kw', 'bw', 'nw', 'rw'],
@@ -12,7 +11,6 @@ const initialBoard: board = [
   ['pb', 'pb', 'pb', 'pb', 'pb', 'pb', 'pb', 'pb'],
   ['rb', 'nb', 'bb', 'qb', 'kb', 'bb', 'nb', 'rb'],
 ]
-
 const emptyBoard: board = [
   ['-', '-', '-', '-', '-', '-', '-', '-'],
   ['-', '-', '-', '-', '-', '-', '-', '-'],
@@ -23,6 +21,8 @@ const emptyBoard: board = [
   ['-', '-', '-', '-', '-', '-', '-', '-'],
   ['-', '-', '-', '-', '-', '-', '-', '-'],
 ]
+const canCastle = {rb0: false, rb7: false, kb: false, rw0: false, rw7: false, kw: false};
+const cannotCastle = {rb0: true, rb7: true, kb: true, rw0: true, rw7: true, kw: true};
 
 describe('isInCheck', (): void => {
   let board: board;
@@ -67,12 +67,13 @@ describe('isInCheck', (): void => {
   })
 })
 describe('updateBoard', (): void => {
+  let board: board = JSON.parse(JSON.stringify(emptyBoard));
+  beforeEach(() => board = JSON.parse(JSON.stringify(emptyBoard)))
   it('should move a piece to an empty square', (): void => {
-    const board: board = JSON.parse(JSON.stringify(emptyBoard));
     const expectedBoard: board = JSON.parse(JSON.stringify(emptyBoard));
     board[0][0] = 'rw';
     expectedBoard[0][7] = 'rw';
-    const newBoard = updateBoard(board, [0, 0], [0, 7]);
+    const newBoard = updateBoard(board, [0, 0], [0, 7], 'w');
     expect(JSON.stringify(newBoard)).toBe(JSON.stringify(expectedBoard));
   })
   it('should replace a piece on a non-empty square', (): void => {
@@ -81,7 +82,7 @@ describe('updateBoard', (): void => {
     board[0][0] = 'rw';
     board[0][7] = 'rb';
     expectedBoard[0][7] = 'rw';
-    const newBoard = updateBoard(board, [0, 0], [0, 7]);
+    const newBoard = updateBoard(board, [0, 0], [0, 7], 'w');
     expect(JSON.stringify(newBoard)).toBe(JSON.stringify(expectedBoard));
   })
   it('should capture an en passanted pawn', (): void => {
@@ -90,7 +91,44 @@ describe('updateBoard', (): void => {
     board[4][4] = 'pw';
     board[4][3] = 'pb';
     expectedBoard[5][3] = 'pw';
-    expect(JSON.stringify(updateBoard(board, [4, 4], [5, 3]))).toBe(JSON.stringify(expectedBoard));
+    expect(JSON.stringify(updateBoard(board, [4, 4], [5, 3], 'w'))).toBe(JSON.stringify(expectedBoard));
+  })
+  it('should move the king and rook when castling', (): void => {
+    board[0][4] = 'kw';
+    board[0][7] = 'rw';
+    const updatedBoard: board = updateBoard(board, [0, 4], [0, 6], 'w');
+    expect(updatedBoard[0][6]).toBe('kw');
+    expect(updatedBoard[0][5]).toBe('rw');
+    board[7][4] = 'kb';
+    board[7][0] = 'rb';
+    const updatedBoard2: board = updateBoard(board, [7, 4], [7, 2], 'b');
+    expect(updatedBoard2[7][2]).toBe('kb');
+    expect(updatedBoard2[7][3]).toBe('rb');
+  })
+})
+describe('updateCastlingOptions', (): void => {
+  let board: board;
+  beforeEach(() => board = JSON.parse(JSON.stringify(emptyBoard)));
+  it('should not update if no king or rook was moved or captured', (): void => {
+    board[0][0] = 'qb';
+    const newCastlingRights = updateCastlingOptions(canCastle, board, [0, 0], [0, 5], 'b');
+    expect(newCastlingRights).toEqual(canCastle);
+  })
+  it('should remove castling rights if king moved', (): void => {
+    board[0][4] = 'kw';
+    const newCastlingRights = updateCastlingOptions(canCastle, board, [0, 4], [0, 5], 'w');
+    expect(newCastlingRights.kw).toBe(true);
+  })
+  it('should remove castling rights if rook moved', (): void => {
+    board[0][0] = 'rw';
+    const newCastlingRights = updateCastlingOptions(canCastle, board, [0, 0], [0, 5], 'w');
+    expect(newCastlingRights.rw0).toBe(true);
+  })
+  it('should remove castling rights if rook captured', (): void => {
+    board[0][0] = 'rw';
+    board[7][0] = 'rb'
+    const newCastlingRights = updateCastlingOptions(canCastle, board, [7, 0], [0, 0], 'b');
+    expect(newCastlingRights.rw0).toBe(true);
   })
 })
 describe('getMoves', (): void => {
@@ -111,7 +149,7 @@ describe('getMoves', (): void => {
     board[0][0] = 'kb';
     board[7][1] = 'rw';
     board[1][7] = 'rw';
-    const emptyMoves: moves = getMoves(board, [0, 0], 'b');
+    const emptyMoves: moves = getMoves(board, [0, 0], 'b', undefined, cannotCastle);
     expect(emptyMoves.moves).toHaveLength(0);
     expect(emptyMoves.captures).toHaveLength(0);
   })
@@ -268,35 +306,70 @@ describe ('bishopMoves', (): void => {
   })
 }) 
 describe ('kingMoves', (): void => {
-  const board = JSON.parse(JSON.stringify(emptyBoard));
+  let board = JSON.parse(JSON.stringify(emptyBoard));
+  beforeEach(() => board = JSON.parse(JSON.stringify(emptyBoard)));
   it('should return an empty moves object when the king is trapped', (): void => {
     board[0][0] = 'kw';
     board[0][1] = 'nw';
     board[1][0] = 'nw';
     board[1][1] = 'nw';
-    const emptyMoves = kingMoves(board, [0, 0], 'w');
+    const emptyMoves = kingMoves(board, [0, 0], 'w', cannotCastle);
     expect(emptyMoves.moves).toHaveLength(0);
     expect(emptyMoves.captures).toHaveLength(0);
   })
   it('should return all of the squares the king can move to', (): void => {
     board[4][4] = 'kw';
-    const moves = kingMoves(board, [4, 4], 'w');
+    const moves = kingMoves(board, [4, 4], 'w', cannotCastle);
     expect(moves.moves).toHaveLength(8);
     expect(moves.captures).toHaveLength(0);
   })
   it('should return all of the squares the king can capture', (): void => {
+    board[4][4] = 'kw';
     board[4][5] = 'bb';
     board[3][4] = 'rb';
-    const moves = kingMoves(board, [4, 4], 'w');
+    const moves = kingMoves(board, [4, 4], 'w', cannotCastle);
     expect(moves.moves).toHaveLength(6);
     expect(moves.captures).toHaveLength(2);
     
   })
   it('should not allow the king to capture its own pieces', (): void => {
+    board[4][4] = 'kw';
     board[5][5] = 'rw';
-    const moves = kingMoves(board, [4, 4], 'w');
+    const moves = kingMoves(board, [4, 4], 'w', cannotCastle);
+    expect(moves.moves).toHaveLength(7);
+    expect(moves.captures).toHaveLength(0);
+  })
+  it('should not let the king castle while in check', (): void => {
+    board[0][4] = 'kw';
+    board[0][0] = 'rw';
+    board[0][7] = 'rw';
+    board[7][4] = 'qb';
+    const moves = kingMoves(board, [0, 4], 'w', canCastle);
     expect(moves.moves).toHaveLength(5);
-    expect(moves.captures).toHaveLength(2);
+  })
+  it('should not let the king castle through check', (): void => {
+    board[7][4] = 'kb';
+    board[7][0] = 'rb';
+    board[7][7] = 'rb';
+    board[0][5] = 'qw';
+    const moves = kingMoves(board, [7, 4], 'b', canCastle);
+    expect(moves.moves).toHaveLength(6);
+  })
+  it('should not let the king castle through pieces', (): void => {
+    board[7][4] = 'kb';
+    board[7][6] = 'nw';
+    board[7][1] = 'nb';
+    board[7][0] = 'rb';
+    board[7][7] = 'rb';
+    const moves = kingMoves(board, [7, 4], 'b', canCastle);
+    expect(moves.moves).toHaveLength(5);
+  })
+  it('should let the king castle when legal', (): void => {
+    board[0][4] = 'kw';
+    board[0][0] = 'rw';
+    board[0][7] = 'rw';
+    const moves = kingMoves(board, [0, 4], 'w', canCastle);
+    expect(moves.moves).toHaveLength(7);
   })
 }) 
 describe ('pawnMoves', (): void => {

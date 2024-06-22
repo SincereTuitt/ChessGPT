@@ -1,8 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { updateBoard } from "../chessLogic/legalMoves";
 
 const initialState = {
-  board: [
+	board: [
 		['rw', 'nw', 'bw', 'qw', 'kw', 'bw', 'nw', 'rw'],
 		['pw', 'pw', 'pw', 'pw', 'pw', 'pw', 'pw', 'pw'],
 		['-', '-', '-', '-', '-', '-', '-', '-'],
@@ -14,15 +13,16 @@ const initialState = {
 	],
 	currentPlayer: 'w',
 	selectedSquare: null,
-	potentialMoves: {moves:  [], captures: []},
+	potentialMoves: { moves: [], captures: [] },
 	isTwoPlayer: true,
-	pawnJumpedLastTurn: false // set to coordinate of pawn that moves two squares
+	pawnJumpedLastTurn: false, // set to coordinate of pawn that moves two squares
+	movedCastlers: { rb0: false, rb7: false, kb: false, rw0: false, rw7: false, kw: false }
 };
 
-export const boardSlice = createSlice ({
-  name: 'board',
-  initialState,
-  reducers: {
+export const boardSlice = createSlice({
+	name: 'board',
+	initialState,
+	reducers: {
 		selectSquare: (state, action) => {
 			state.selectedSquare = action.payload;
 		},
@@ -37,9 +37,12 @@ export const boardSlice = createSlice ({
 		},
 		setPawnJumpPrevious: (state, action) => {
 			state.pawnJumpedLastTurn = action.payload;
+		},
+		setMovedCastlers: (state, action) => {
+			state.movedCastlers = action.payload;
 		}
-  }
+	}
 });
 
-export const {selectSquare, setPotentialMoves, setNewBoard, switchPlayer, setPawnJumpPrevious} = boardSlice.actions;
+export const { selectSquare, setPotentialMoves, setNewBoard, switchPlayer, setPawnJumpPrevious, setMovedCastlers } = boardSlice.actions;
 export default boardSlice.reducer;
