@@ -3,7 +3,8 @@ import { board, coordinate, moves, piece, player } from './types';
 export function getMoves(
   boardState: board,
   selectedSquare: coordinate,
-  currentPlayer: player
+  currentPlayer: player,
+  pawnJumpPrevious?: coordinate
 ): moves {
 
   const selectedPiece: piece = boardState[selectedSquare[0]][selectedSquare[1]];
@@ -29,7 +30,7 @@ export function getMoves(
       output = kingMoves(boardState, selectedSquare, currentPlayer);
       break;
     case 'p':
-      output = pawnMoves(boardState, selectedSquare, currentPlayer);
+      output = pawnMoves(boardState, selectedSquare, currentPlayer, pawnJumpPrevious);
       break;
     default:
       break;
@@ -100,6 +101,16 @@ export function isInCheck(boardState: board, currentPlayer: player): boolean {
 
 export function updateBoard(currentBoard: board, [previousRow, previousColumn]: coordinate, [nextRow, nextColumn]: coordinate): board {
   const newBoard: board = JSON.parse(JSON.stringify(currentBoard));
+  const currentPlayer = currentBoard[previousRow][previousColumn][1];
+  const currentPiece = currentBoard[previousRow][previousColumn][0];
+
+  // handle en passant
+  if (
+    currentPiece === 'p'
+    && currentBoard[nextRow][nextColumn] === '-'
+    && previousColumn !== nextColumn
+  ) newBoard[currentPlayer === 'w' ? nextRow - 1 : nextRow + 1][nextColumn] = '-';
+  
   newBoard[nextRow][nextColumn] = currentBoard[previousRow][previousColumn];
   newBoard[previousRow][previousColumn] = '-';
   return newBoard;
@@ -159,12 +170,12 @@ export function rookMoves(
 export function pawnMoves(
   boardState: board,
   selectedSquare: coordinate,
-  currentPlayer: player
+  currentPlayer: player,
+  pawnJumpPrevious?: coordinate
 ): moves {
   const output: moves = { moves: [], captures: [] }
   const row: number = selectedSquare[0];
   const column: number = selectedSquare[1];
-
   switch (currentPlayer) {
     case 'w':
       // check if pawn can advance
@@ -188,7 +199,16 @@ export function pawnMoves(
         && boardState[row + 1][column - 1] !== '-'
         && boardState[row + 1][column - 1][1] !== currentPlayer
       ) output.captures.push([row + 1, column - 1]);
-      // @TODO check if pawn can en passant
+
+      // check if pawn can en passant
+      if (pawnJumpPrevious
+        && pawnJumpPrevious[0] === row
+        && pawnJumpPrevious[1] === column + 1
+      ) output.captures.push([row + 1, column + 1]);
+      if (pawnJumpPrevious
+        && pawnJumpPrevious[0] === row
+        && pawnJumpPrevious[1] === column - 1
+      ) output.captures.push([row + 1, column - 1]);
       // @TODO handle promotion
       break;
 
@@ -214,7 +234,16 @@ export function pawnMoves(
         && boardState[row - 1][column - 1] !== '-'
         && boardState[row - 1][column - 1][1] !== currentPlayer
       ) output.captures.push([row - 1, column - 1]);
-      // @TODO check if pawn can en passant
+
+      // check if pawn can en passant
+      if (pawnJumpPrevious
+        && pawnJumpPrevious[0] === row
+        && pawnJumpPrevious[1] === column + 1
+      ) output.captures.push([row - 1, column + 1]);
+      if (pawnJumpPrevious
+        && pawnJumpPrevious[0] === row
+        && pawnJumpPrevious[1] === column - 1
+      ) output.captures.push([row - 1, column - 1]);
       // @TODO handle promotion
       break;
 

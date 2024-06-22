@@ -7,5 +7,5 @@
     "esModuleInterop": true,
     "noImplicitAny": true,
   },
-  "include": ["src/**/*"],
+  "include": ["src/client/chessLogic/legalMoves.ts"],
 }

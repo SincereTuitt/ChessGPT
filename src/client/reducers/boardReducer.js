@@ -15,8 +15,8 @@ const initialState = {
 	currentPlayer: 'w',
 	selectedSquare: null,
 	potentialMoves: {moves:  [], captures: []},
-	previousBoardStates: [],
-	isTwoPlayer: true
+	isTwoPlayer: true,
+	pawnJumpedLastTurn: false // set to coordinate of pawn that moves two squares
 };
 
 export const boardSlice = createSlice ({
@@ -35,11 +35,11 @@ export const boardSlice = createSlice ({
 		switchPlayer: (state) => {
 			state.currentPlayer = state.currentPlayer === 'w' ? 'b' : 'w';
 		},
-		addPreviousMove: (state, action) => {
-			state.previousBoardStates.push(action.payload);
+		setPawnJumpPrevious: (state, action) => {
+			state.pawnJumpedLastTurn = action.payload;
 		}
   }
 });
 
-export const {selectSquare, setPotentialMoves, setNewBoard, switchPlayer, addPreviousMove} = boardSlice.actions;
+export const {selectSquare, setPotentialMoves, setNewBoard, switchPlayer, setPawnJumpPrevious} = boardSlice.actions;
 export default boardSlice.reducer;

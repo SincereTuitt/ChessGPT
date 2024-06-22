@@ -63,7 +63,6 @@ describe('isInCheck', (): void => {
     expect(isInCheck(board, 'w')).toBe(true);
     board[1][1] = '-';
     board[0][1] = 'kb';
-    console.log({board})
     expect(isInCheck(board, 'b')).toBe(true);
   })
 })
@@ -84,6 +83,14 @@ describe('updateBoard', (): void => {
     expectedBoard[0][7] = 'rw';
     const newBoard = updateBoard(board, [0, 0], [0, 7]);
     expect(JSON.stringify(newBoard)).toBe(JSON.stringify(expectedBoard));
+  })
+  it('should capture an en passanted pawn', (): void => {
+    const board: board = JSON.parse(JSON.stringify(emptyBoard));
+    const expectedBoard: board = JSON.parse(JSON.stringify(emptyBoard));
+    board[4][4] = 'pw';
+    board[4][3] = 'pb';
+    expectedBoard[5][3] = 'pw';
+    expect(JSON.stringify(updateBoard(board, [4, 4], [5, 3]))).toBe(JSON.stringify(expectedBoard));
   })
 })
 describe('getMoves', (): void => {
@@ -324,5 +331,13 @@ describe ('pawnMoves', (): void => {
     expect(moves.moves).toHaveLength(1);
     expect(moves.captures).toHaveLength(1);
 
+  })
+  it('should allow en passant only of a pawn that advanced two squares in the previous move', (): void => {
+    board[4][3] = 'pb';
+    board[4][5] = 'pb';
+    board[5][5] = '-';
+    const moves = pawnMoves(board, [4, 4], 'w', [4, 3]);
+    expect(moves.moves).toHaveLength(1);
+    expect(moves.captures).toHaveLength(1);
   })
 }) 

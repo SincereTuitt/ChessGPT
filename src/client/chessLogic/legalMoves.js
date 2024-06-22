@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function getMoves(boardState, selectedSquare, currentPlayer) {
+function getMoves(boardState, selectedSquare, currentPlayer, pawnJumpPrevious) {
     const selectedPiece = boardState[selectedSquare[0]][selectedSquare[1]];
     let output = { moves: [], captures: [] };
     if (selectedPiece === '-' || selectedPiece[1] !== currentPlayer)
@@ -22,7 +22,7 @@ function getMoves(boardState, selectedSquare, currentPlayer) {
             output = kingMoves(boardState, selectedSquare, currentPlayer);
             break;
         case 'p':
-            output = pawnMoves(boardState, selectedSquare, currentPlayer);
+            output = pawnMoves(boardState, selectedSquare, currentPlayer, pawnJumpPrevious);
             break;
         default:
             break;
@@ -92,6 +92,12 @@ function isInCheck(boardState, currentPlayer) {
 exports.isInCheck = isInCheck;
 function updateBoard(currentBoard, [previousRow, previousColumn], [nextRow, nextColumn]) {
     const newBoard = JSON.parse(JSON.stringify(currentBoard));
+    const currentPlayer = currentBoard[previousRow][previousColumn][1];
+    const currentPiece = currentBoard[previousRow][previousColumn][0];
+    if (currentPiece === 'p'
+        && currentBoard[nextRow][nextColumn] === '-'
+        && previousColumn !== nextColumn)
+        newBoard[currentPlayer === 'w' ? nextRow - 1 : nextRow + 1][nextColumn] = '-';
     newBoard[nextRow][nextColumn] = currentBoard[previousRow][previousColumn];
     newBoard[previousRow][previousColumn] = '-';
     return newBoard;
@@ -148,7 +154,7 @@ function rookMoves(boardState, selectedSquare, currentPlayer) {
     return output;
 }
 exports.rookMoves = rookMoves;
-function pawnMoves(boardState, selectedSquare, currentPlayer) {
+function pawnMoves(boardState, selectedSquare, currentPlayer, pawnJumpPrevious) {
     const output = { moves: [], captures: [] };
     const row = selectedSquare[0];
     const column = selectedSquare[1];
@@ -168,6 +174,14 @@ function pawnMoves(boardState, selectedSquare, currentPlayer) {
                 && boardState[row + 1][column - 1] !== '-'
                 && boardState[row + 1][column - 1][1] !== currentPlayer)
                 output.captures.push([row + 1, column - 1]);
+            if (pawnJumpPrevious
+                && pawnJumpPrevious[0] === row
+                && pawnJumpPrevious[1] === column + 1)
+                output.captures.push([row + 1, column + 1]);
+            if (pawnJumpPrevious
+                && pawnJumpPrevious[0] === row
+                && pawnJumpPrevious[1] === column - 1)
+                output.captures.push([row + 1, column - 1]);
             break;
         case 'b':
             if (boardState[row - 1][column] === '-')
@@ -183,6 +197,14 @@ function pawnMoves(boardState, selectedSquare, currentPlayer) {
             if (boardState[row - 1][column - 1]
                 && boardState[row - 1][column - 1] !== '-'
                 && boardState[row - 1][column - 1][1] !== currentPlayer)
+                output.captures.push([row - 1, column - 1]);
+            if (pawnJumpPrevious
+                && pawnJumpPrevious[0] === row
+                && pawnJumpPrevious[1] === column + 1)
+                output.captures.push([row - 1, column + 1]);
+            if (pawnJumpPrevious
+                && pawnJumpPrevious[0] === row
+                && pawnJumpPrevious[1] === column - 1)
                 output.captures.push([row - 1, column - 1]);
             break;
         default:
