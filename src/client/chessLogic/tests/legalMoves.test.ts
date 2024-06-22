@@ -1,4 +1,4 @@
-import { rookMoves, knightMoves, bishopMoves, kingMoves, queenMoves, pawnMoves, getMoves } from "../legalMoves";
+import { rookMoves, knightMoves, bishopMoves, kingMoves, queenMoves, pawnMoves, getMoves, isInCheck, updateBoard } from "../legalMoves";
 import { board, coordinate, moves, piece, player } from '../types';
 
 
@@ -24,32 +24,105 @@ const emptyBoard: board = [
   ['-', '-', '-', '-', '-', '-', '-', '-'],
 ]
 
-xdescribe('getMoves', (): void => {
+describe('isInCheck', (): void => {
+  let board: board;
+  beforeEach(() => {
+    board = JSON.parse(JSON.stringify(emptyBoard));
+  })
+
+  it('should return true if an enemy piece sees the king', (): void => {
+    board[0][0] = 'kw';
+    board[0][7] = 'rb';
+    expect(isInCheck(board, 'w')).toBe(true);
+    board[0][7] = '-';
+    board[1][2] = 'nb';
+    expect(isInCheck(board, 'w')).toBe(true);
+    board[1][2] = '-';
+    board[4][4] = 'qb';
+    expect(isInCheck(board, 'w')).toBe(true);
+  })
+  it('should return false if not in check', (): void => {
+    board[0][0] = 'kb';
+    board[1][6] = 'rw';
+    board[3][4] = 'qw';
+    board[5][5] = 'nw';
+    board[2][2] = 'pw';
+    expect(isInCheck(board, 'b')).toBe(false);
+  })
+  it('should return false if a friendly piece blocks check', (): void => {
+    board[0][0] = 'kb';
+    board[0][7] = 'rw';
+    board[0][4] = 'rb';
+    board[5][5] = 'bw';
+    board[3][3] = 'bb';
+    expect(isInCheck(board, 'b')).toBe(false);
+  })
+  it('should return true when the enemy king is adjacent', (): void => { // not technically check ofc
+    board[0][0] = 'kw';
+    board[1][1] = 'kb';
+    expect(isInCheck(board, 'w')).toBe(true);
+    board[1][1] = '-';
+    board[0][1] = 'kb';
+    console.log({board})
+    expect(isInCheck(board, 'b')).toBe(true);
+  })
+})
+describe('updateBoard', (): void => {
+  it('should move a piece to an empty square', (): void => {
+    const board: board = JSON.parse(JSON.stringify(emptyBoard));
+    const expectedBoard: board = JSON.parse(JSON.stringify(emptyBoard));
+    board[0][0] = 'rw';
+    expectedBoard[0][7] = 'rw';
+    const newBoard = updateBoard(board, [0, 0], [0, 7]);
+    expect(JSON.stringify(newBoard)).toBe(JSON.stringify(expectedBoard));
+  })
+  it('should replace a piece on a non-empty square', (): void => {
+    const board: board = JSON.parse(JSON.stringify(emptyBoard));
+    const expectedBoard: board = JSON.parse(JSON.stringify(emptyBoard));
+    board[0][0] = 'rw';
+    board[0][7] = 'rb';
+    expectedBoard[0][7] = 'rw';
+    const newBoard = updateBoard(board, [0, 0], [0, 7]);
+    expect(JSON.stringify(newBoard)).toBe(JSON.stringify(expectedBoard));
+  })
+})
+describe('getMoves', (): void => {
   it('should return an empty moves object when the selected square is empty', (): void => {
     const emptyMoves: moves = getMoves(initialBoard, [3, 3], 'w');
     expect(emptyMoves.moves).toHaveLength(0);
     expect(emptyMoves.captures).toHaveLength(0);
   })
   it('should return an empty moves object when the selected piece does not belong to the current player', (): void => {
-    const emptyMoves: moves = getMoves(initialBoard, [1, 6], 'w');
+    const emptyMoves: moves = getMoves(initialBoard, [6, 6], 'w');
     expect(emptyMoves.moves).toHaveLength(0);
     expect(emptyMoves.captures).toHaveLength(0);
   })
-  const board = JSON.parse(JSON.stringify(emptyBoard));
-  board[0][0] = 'kb';
-  board[7][1] = 'rw';
-  board[1][7] = 'rw';
+  let board = JSON.parse(JSON.stringify(emptyBoard));
+  beforeEach((): void => {board = JSON.parse(JSON.stringify(emptyBoard));})
+
   it('should not allow the king to move into check', (): void => {
+    board[0][0] = 'kb';
+    board[7][1] = 'rw';
+    board[1][7] = 'rw';
     const emptyMoves: moves = getMoves(board, [0, 0], 'b');
     expect(emptyMoves.moves).toHaveLength(0);
     expect(emptyMoves.captures).toHaveLength(0);
   })
-  board[3][3] = 'rb';
-  board[5][5] = 'qw';
   it('should not allow a piece blocking check to move', (): void => {
+    board[0][0] = 'kb';
+    board[3][3] = 'rb';
+    board[5][5] = 'qw';
     const emptyMoves: moves = getMoves(board, [3, 3], 'b');
     expect(emptyMoves.moves).toHaveLength(0);
     expect(emptyMoves.captures).toHaveLength(0);
+  })
+  it('should allow all moves that do not put the king in danger', (): void => {
+    board[0][0] = 'kb';
+    board[3][3] = 'bb';
+    board[7][7] = 'qw';
+    const moves: moves = getMoves(board, [3, 3], 'b');
+    expect(moves.moves).toHaveLength(5);
+    expect(moves.captures).toHaveLength(1);
   })
 })
 describe ('rookMoves', (): void => {
