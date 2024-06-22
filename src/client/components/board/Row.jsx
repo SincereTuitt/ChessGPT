@@ -2,18 +2,21 @@ import React from "react";
 import Square from './Square.jsx';
 
 
-const Row = ({ rowData, rowNumber, theme }) => {
+const Row = ({ rowData, rowNumber, theme, isBoardFlipped }) => {
   const getSquareColor = (columnNumber) => {
     return rowNumber % 2 === columnNumber % 2 ? 'dark' : 'light';
   };
 
   return (
-    <div className="row">
+    <div className="row" style={
+			isBoardFlipped ? {flexDirection: "row-reverse"} : {}
+		}>
       {rowData.map((square, index) => (
         <Square
           colorType={ getSquareColor(index)}
           piece={rowData[index]}
           theme={theme}
+          coordinate={[rowNumber, index]}
           key={crypto.randomUUID()}
         />
       ))}

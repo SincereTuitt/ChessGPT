@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { updateBoard } from "../chessLogic/legalMoves";
 
 const initialState = {
   board: [
@@ -11,15 +12,34 @@ const initialState = {
 		['pb', 'pb', 'pb', 'pb', 'pb', 'pb', 'pb', 'pb'],
 		['rb', 'nb', 'bb', 'qb', 'kb', 'bb', 'nb', 'rb'],
 	],
-
+	currentPlayer: 'w',
+	selectedSquare: null,
+	potentialMoves: {moves:  [], captures: []},
+	previousBoardStates: [],
+	isTwoPlayer: true
 };
 
 export const boardSlice = createSlice ({
   name: 'board',
   initialState,
   reducers: {
-
+		selectSquare: (state, action) => {
+			state.selectedSquare = action.payload;
+		},
+		setPotentialMoves: (state, action) => {
+			state.potentialMoves = action.payload;
+		},
+		setNewBoard: (state, action) => {
+			state.board = action.payload
+		},
+		switchPlayer: (state) => {
+			state.currentPlayer = state.currentPlayer === 'w' ? 'b' : 'w';
+		},
+		addPreviousMove: (state, action) => {
+			state.previousBoardStates.push(action.payload);
+		}
   }
 });
 
+export const {selectSquare, setPotentialMoves, setNewBoard, switchPlayer, addPreviousMove} = boardSlice.actions;
 export default boardSlice.reducer;

@@ -83,7 +83,6 @@ export function isInCheck(boardState: board, currentPlayer: player): boolean {
           break;
         case 'k':
           capturableSquares = kingMoves(boardState, [i, j], currentPlayer === 'w' ? 'b' : 'w').captures;
-          console.log('king captures', { capturableSquares }, [kingRow, kingColumn])
           if (capturableSquares.some(([a, b]) => a === kingRow && b === kingColumn)) return true;
           break;
         case 'p':
@@ -180,11 +179,13 @@ export function pawnMoves(
 
       // check if pawn can capture
       if (
-        boardState[row + 1][column + 1] !== '-'
+        boardState[row + 1][column + 1]
+        && boardState[row + 1][column + 1] !== '-'
         && boardState[row + 1][column + 1][1] !== currentPlayer
       ) output.captures.push([row + 1, column + 1]);
       if (
-        boardState[row + 1][column - 1] !== '-'
+        boardState[row + 1][column - 1]
+        && boardState[row + 1][column - 1] !== '-'
         && boardState[row + 1][column - 1][1] !== currentPlayer
       ) output.captures.push([row + 1, column - 1]);
       // @TODO check if pawn can en passant
@@ -204,11 +205,13 @@ export function pawnMoves(
 
       // check if pawn can capture
       if (
-        boardState[row - 1][column + 1] !== '-'
+        boardState[row - 1][column + 1]
+        && boardState[row - 1][column + 1] !== '-'
         && boardState[row - 1][column + 1][1] !== currentPlayer
       ) output.captures.push([row - 1, column + 1]);
       if (
-        boardState[row - 1][column - 1] !== '-'
+        boardState[row - 1][column - 1]
+        && boardState[row - 1][column - 1] !== '-'
         && boardState[row - 1][column - 1][1] !== currentPlayer
       ) output.captures.push([row - 1, column - 1]);
       // @TODO check if pawn can en passant
