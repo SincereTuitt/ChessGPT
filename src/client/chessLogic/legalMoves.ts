@@ -79,6 +79,60 @@ export function pawnMoves(
   currentPlayer: player
 ): moves {
   const output: moves = { moves: [], captures: [] }
+  const row: number = selectedSquare[0];
+  const column: number = selectedSquare[1];
+
+  switch (currentPlayer) {
+    case 'w':
+      // check if pawn can advance
+      if (boardState[row + 1][column] === '-') output.moves.push([row + 1, column]);
+
+      // check if pawn can move two squares
+      if (
+        row === 1
+        && boardState[row + 1][column] === '-' 
+        && boardState[row + 2][column] === '-' 
+      ) output.moves.push([row + 2, column]);
+
+      // check if pawn can capture
+      if (
+        boardState[row + 1][column + 1] !== '-' 
+        && boardState[row + 1][column + 1][1] !== currentPlayer
+      ) output.captures.push([row + 1, column + 1]);
+      if (
+        boardState[row + 1][column - 1] !== '-' 
+        && boardState[row + 1][column - 1][1] !== currentPlayer
+      ) output.captures.push([row + 1, column - 1]);
+      // @TODO check if pawn can en passant
+      break;
+      
+    case 'b':
+      console.log('B!', currentPlayer)
+      // check if pawn can advance
+      if (boardState[row - 1][column] === '-') output.moves.push([row - 1, column]);
+
+      // check if pawn can move two squares
+      if (
+        row === 6
+        && boardState[row - 1][column] === '-' 
+        && boardState[row - 2][column] === '-' 
+      ) output.moves.push([row - 2, column]);
+
+      // check if pawn can capture
+      if (
+        boardState[row - 1][column + 1] !== '-' 
+        && boardState[row - 1][column + 1][1] !== currentPlayer
+      ) output.captures.push([row - 1, column + 1]);
+      if (
+        boardState[row - 1][column - 1] !== '-' 
+        && boardState[row - 1][column - 1][1] !== currentPlayer
+      ) output.captures.push([row - 1, column - 1]);
+      // @TODO check if pawn can en passant
+      break;
+  
+    default:
+      break;
+  }
   return output;
 }
 

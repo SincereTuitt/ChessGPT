@@ -220,18 +220,18 @@ xdescribe ('kingMoves', (): void => {
 
   })
 }) 
-xdescribe ('pawnMoves', (): void => {
+describe ('pawnMoves', (): void => {
   const board = JSON.parse(JSON.stringify(emptyBoard));
-  board[1][1] = 'pw';
-  board[2][1] = 'rw';
   it('should return an empty moves object when the pawn is trapped', (): void => {
+    board[1][1] = 'pw';
+    board[2][1] = 'rw';
     const emptyMoves = pawnMoves(board, [1, 1], 'w');
     expect(emptyMoves.moves).toHaveLength(0);
     expect(emptyMoves.captures).toHaveLength(0);
   })
-  board[2][1] = '-';
-  board[5][5] = 'pb';
   it('should return all of the squares the pawn can move to', (): void => {
+    board[2][1] = '-';
+    board[5][5] = 'pb';
     const whiteMoves = pawnMoves(board, [1, 1], 'w');
     const blackMoves = pawnMoves(board, [5, 5], 'b');
     expect(whiteMoves.moves).toHaveLength(2);
@@ -239,15 +239,15 @@ xdescribe ('pawnMoves', (): void => {
     expect(blackMoves.moves).toHaveLength(1);
     expect(blackMoves.captures).toHaveLength(0);
   })
-  board[4][4] = 'pw';
   it('should return all of the squares the pawn can capture', (): void => {
+    board[4][4] = 'pw';
     const moves = pawnMoves(board, [5, 5], 'b');
     expect(moves.moves).toHaveLength(1);
     expect(moves.captures).toHaveLength(1);
     
   })
-  board[4][6] = 'pb';
   it('should not allow the pawn to capture its own pieces', (): void => {
+    board[4][6] = 'pb';
     const moves = pawnMoves(board, [5, 5], 'b');
     expect(moves.moves).toHaveLength(1);
     expect(moves.captures).toHaveLength(1);
