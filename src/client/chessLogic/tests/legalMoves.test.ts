@@ -121,38 +121,37 @@ describe ('queenMoves', (): void => {
 
   })
 }) 
-xdescribe ('knightMoves', (): void => {
+describe ('knightMoves', (): void => {
   const board = JSON.parse(JSON.stringify(emptyBoard));
-  board[0][0] = 'nb';
-  board[2][1] = 'nb';
-  board[1][2] = 'nb';
   it('should return an empty moves object when the knight is trapped', (): void => {
+    board[0][0] = 'nb';
+    board[2][1] = 'nb';
+    board[1][2] = 'nb';
     const emptyMoves = knightMoves(board, [0, 0], 'b');
     expect(emptyMoves.moves).toHaveLength(0);
     expect(emptyMoves.captures).toHaveLength(0);
   })
-  board[2][1] = '-';
-  board[1][2] = '-';
-  board[3][3] = 'nb';
   it('should return all of the squares the knight can move to', (): void => {
+    board[2][1] = '-';
+    board[1][2] = '-';
+    board[3][3] = 'nb';
     const moves = knightMoves(board, [3, 3], 'b');
     expect(moves.moves).toHaveLength(8);
     expect(moves.captures).toHaveLength(0);
   })
-  board[2][1] = 'bw';
-  board[4][5] = 'rw';
   it('should return all of the squares the knight can capture', (): void => {
+    board[2][1] = 'bw';
+    board[4][5] = 'rw';
     const moves = knightMoves(board, [3, 3], 'b');
     expect(moves.moves).toHaveLength(6);
     expect(moves.captures).toHaveLength(2);
     
   })
-  board[5][2] = 'rb';
   it('should not allow the knight to capture its own pieces', (): void => {
+    board[5][2] = 'rb';
     const moves = knightMoves(board, [3, 3], 'b');
     expect(moves.moves).toHaveLength(5);
     expect(moves.captures).toHaveLength(2);
-
   })
 }) 
 describe ('bishopMoves', (): void => {

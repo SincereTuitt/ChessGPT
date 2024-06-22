@@ -88,6 +88,25 @@ export function knightMoves(
   currentPlayer: player
 ): moves {
   const output: moves = { moves: [], captures: [] }
+  const row = selectedSquare[0];
+  const column = selectedSquare[1];
+  const possibleMoves: coordinate[] = [
+    [row + 1, column + 2],
+    [row + 1, column - 2],
+    [row - 1, column + 2],
+    [row - 1, column - 2],
+    [row + 2, column + 1],
+    [row + 2, column - 1],
+    [row - 2, column + 1],
+    [row - 2, column - 1],
+  ]
+  possibleMoves.forEach((coordinate) => {
+    const [i, j]: coordinate = coordinate;
+    if (i > 7 || j > 7 || i < 0 || j < 0) return;
+    const square: piece = boardState[i][j];
+    if (square === '-') output.moves.push([i, j]);
+    else if (square[1] !== currentPlayer) output.captures.push([i, j]);
+  })
   return output;
 }
 
