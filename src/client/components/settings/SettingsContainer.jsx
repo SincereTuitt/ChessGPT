@@ -10,7 +10,7 @@ const SettingsContainer = () => {
     let backgroundColor = 'light' + theme;
     if (theme === 'red') backgroundColor = '#ff575f';
     return [headerColor, backgroundColor];
-  }
+  };
   const colorScheme = getColors();
 
   return (
@@ -21,6 +21,6 @@ const SettingsContainer = () => {
       <ThemeContainer />
     </div> 
   )
-}
+};
 
 export default SettingsContainer;
