@@ -104,14 +104,15 @@ export function pawnMoves(
         && boardState[row + 1][column - 1][1] !== currentPlayer
       ) output.captures.push([row + 1, column - 1]);
       // @TODO check if pawn can en passant
+      // @TODO handle promotion
       break;
       
-    case 'b':
-      console.log('B!', currentPlayer)
-      // check if pawn can advance
-      if (boardState[row - 1][column] === '-') output.moves.push([row - 1, column]);
+      case 'b':
+        console.log('B!', currentPlayer)
+        // check if pawn can advance
+        if (boardState[row - 1][column] === '-') output.moves.push([row - 1, column]);
 
-      // check if pawn can move two squares
+        // check if pawn can move two squares
       if (
         row === 6
         && boardState[row - 1][column] === '-' 
@@ -128,6 +129,7 @@ export function pawnMoves(
         && boardState[row - 1][column - 1][1] !== currentPlayer
       ) output.captures.push([row - 1, column - 1]);
       // @TODO check if pawn can en passant
+      // @TODO handle promotion
       break;
   
     default:
@@ -231,6 +233,26 @@ export function kingMoves(
   currentPlayer: player
 ): moves {
   const output: moves = { moves: [], captures: [] }
+  const row: number = selectedSquare[0];
+  const column: number = selectedSquare[1];
+  const possibleMoves: coordinate[] = [
+    [row + 1, column + 1],
+    [row + 1, column - 1],
+    [row - 1, column + 1],
+    [row - 1, column - 1],
+    [row - 1, column],
+    [row + 1, column],
+    [row, column + 1],
+    [row, column - 1],
+  ]
+  possibleMoves.forEach((move: coordinate): void => {
+    const i: number = move[0];
+    const j: number = move[1];
+    if (i > 7 || i < 0 || j > 7 || j < 0) return;
+    const square: piece = boardState[i][j];
+    if (square === '-') output.moves.push([i, j]);
+    else if (square[1] !== currentPlayer) output.captures.push([i, j]);
+  })
   return output;
 }
 
