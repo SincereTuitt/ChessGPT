@@ -8,7 +8,7 @@ import '../../styles/board.css'
 
 const Board = () => {
 	const theme = useSelector((state) => state.settings.theme);
-	const isTwoPlayer = useSelector((state) => state.board.isTwoPlayer);
+	const isTwoPlayer = useSelector((state) => state.settings.isTwoPlayer);
 	const currentPlayer = useSelector((state) => state.board.currentPlayer);
 	const gameOver = useSelector((state) => state.board.gameOver);
 	const boardState = useSelector((state) => state.board);
