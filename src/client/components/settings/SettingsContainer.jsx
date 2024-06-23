@@ -1,7 +1,9 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import ThemeContainer from "./ThemeContainer.jsx";
-import PlayModeContainer from "./PlayModeContainer.jsx";
+import ThemeContainer from "./theme/ThemeContainer.jsx";
+import PlayModeContainer from "./playMode/PlayModeContainer.jsx";
+import PlayerColorContainer from "./playerColor/PlayerColorContainer.jsx";
+import DepthContainer from "./depth/DepthContainer.jsx";
 import '../../styles/settings.css';
 
 const SettingsContainer = () => {
@@ -15,13 +17,15 @@ const SettingsContainer = () => {
   const colorScheme = getColors();
 
   return (
-    <div id="settings" style={{backgroundColor: colorScheme[1]}}>
-      <div id="settingsHeader" style={{backgroundColor: colorScheme[0]}}>
+    <div id="settings" style={{ backgroundColor: colorScheme[1] }}>
+      <div id="settingsHeader" style={{ backgroundColor: colorScheme[0] }}>
         <h3>Settings</h3>
       </div>
       <ThemeContainer />
       <PlayModeContainer />
-    </div> 
+      <PlayerColorContainer />
+      <DepthContainer />
+    </div>
   )
 };
 

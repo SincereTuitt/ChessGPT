@@ -169,6 +169,15 @@ describe('getMoves', (): void => {
     expect(moves.moves).toHaveLength(5);
     expect(moves.captures).toHaveLength(1);
   })
+  it('should return an empty moves object if the player is checkmated', (): void => {
+    board[0][0] = 'kw';
+    board[2][7] = 'rw';
+    board[1][7] = 'rb';
+    board[0][6] = 'rb';
+    const moves: moves = getMoves(board, [2, 7], 'w');
+    expect(moves.moves).toHaveLength(0);
+    expect(moves.captures).toHaveLength(0);
+  })
 })
 describe ('rookMoves', (): void => {
   const board = JSON.parse(JSON.stringify(emptyBoard));
@@ -415,12 +424,13 @@ describe ('pawnMoves', (): void => {
   })
 }) 
 describe ('noLegalMoves', (): void => {
-  let board;
+  let board: board;
   beforeEach(() => board = JSON.parse(JSON.stringify(emptyBoard)));
   it('should return true if player is checkmated', (): void => {
     board[0][0] = 'kw';
-    board[0][5] = 'rb';
-    board[1][6] = 'rb'; 
+    board[1][7] = 'rb';
+    board[2][7] = 'rw';
+    board[0][6] = 'rb';
     expect(noLegalMoves(board, 'w', undefined)).toBe(true);
   })
   it('should return true if player is stalemated', (): void => {

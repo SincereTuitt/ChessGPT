@@ -44,7 +44,7 @@ export const boardSlice = createSlice({
 		setGameOver: (state, action) => {
 			state.gameOver = action.payload;
 		},
-		resetGame: (state) => {
+		resetGame: () => {
 			return initialState;
 		}
 	}

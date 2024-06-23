@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { selectSquare, setPotentialMoves, setNewBoard, switchPlayer, setPawnJumpPrevious, setMovedCastlers, setGameOver } from "../../reducers/boardReducer";
-import { getMoves, updateBoard, updateCastlingOptions, isGameOver, getPawnJumpPrevious } from "../../chessLogic/legalMoves";
+import { selectSquare, setPotentialMoves } from "../../reducers/boardReducer";
+import { getMoves } from "../../chessLogic/legalMoves.js";
 
-const Square = ({ piece, colorType, theme, coordinate }) => {
+const Square = ({ piece, colorType, theme, coordinate, updateBoardStates }) => {
+  const isTwoPlayer = useSelector((state) => state.settings.isTwoPlayer);
+  const playerColor = useSelector((state) => state.settings.playerColor);
   const selectedSquare = useSelector((state) => state.board.selectedSquare);
   const currentPlayer = useSelector((state) => state.board.currentPlayer);
   const boardState = useSelector((state) => state.board.board);
   const potentialMoves = useSelector((state) => state.board.potentialMoves);
   const pawnJumpPrevious = useSelector((state) => state.board.pawnJumpedLastTurn);
   const movedCastlers = useSelector((state) => state.board.movedCastlers);
-  const gameOver = useSelector((state) => state.board.gameOver);
 
   const dispatch = useDispatch();
 
@@ -33,40 +34,26 @@ const Square = ({ piece, colorType, theme, coordinate }) => {
     return potentialMoves.captures.some(([a, b]) => a === coordinate[0] && b === coordinate[1]);
   })();
 
-  const updateBoardStates = () => {
-    dispatch(setPawnJumpPrevious(getPawnJumpPrevious(boardState, selectedSquare, coordinate, currentPlayer)));
-    dispatch(setMovedCastlers(updateCastlingOptions(
-      movedCastlers,
-      boardState,
-      selectedSquare,
-      coordinate,
-      currentPlayer
-    )))
-    const updatedBoard = updateBoard(boardState, selectedSquare, coordinate, currentPlayer)
-    dispatch(setNewBoard(updatedBoard));
-    dispatch(selectSquare(null));
-    dispatch(setPotentialMoves({moves: [], captures: []}));
-    dispatch(switchPlayer());
-    console.log({updatedBoard});
-    dispatch(setGameOver(isGameOver(updatedBoard, currentPlayer === 'w' ? 'b' : 'w', undefined)));
-  }
 
   const clickFunction = () => {
+    // if single player mode and not player's turn, do nothing
+    if (!isTwoPlayer && currentPlayer !== playerColor) return;
+
     // if curren't player's piece, select this square
     if (piece[1] === currentPlayer) {
       dispatch(selectSquare(coordinate));
       dispatch(setPotentialMoves(getMoves(boardState, coordinate, currentPlayer, pawnJumpPrevious, movedCastlers)));
     }
-    
+
     // if square selected already and clicked square not in potentialSquares, set selected to null 
     else if (selectedSquare && !isPotentialSquare && !isPotentialCapture) {
       dispatch(selectSquare(null));
-      dispatch(setPotentialMoves({moves: [], captures: []}));
+      dispatch(setPotentialMoves({ moves: [], captures: [] }));
     }
-    
+
     // if square selected already and clicked square in potentialMoves, update board
-    else if (selectSquare && isPotentialSquare || isPotentialCapture) {
-      updateBoardStates();
+    else if (isPotentialSquare || isPotentialCapture) {
+      updateBoardStates(selectedSquare, coordinate);
     }
   }
 
@@ -81,9 +68,9 @@ const Square = ({ piece, colorType, theme, coordinate }) => {
     >
       <div className={
         (isPotentialSquare ? 'potentialSquare ' : ' ') + (isPotentialCapture ? 'potentialCapture ' : '')
-        }></div>
+      }></div>
     </button>
   )
 }
 
-export default Square;
+export default React.memo(Square);

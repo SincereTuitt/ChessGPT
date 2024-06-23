@@ -44,8 +44,7 @@ export function getEngineMove(
       newPawnJumpPrevious,
       option.score)
     return option;
-  })
-
+  });
   return chooseBestOption(currentPlayer, movesWithUpdatedScores);
 }
 
@@ -60,6 +59,7 @@ export function getNodeScore(
   if (depth <= 0) return score;
 
   const possibleMoves = getAllMoves(score!, boardState, currentPlayer, pawnJumpPrevious, movedCastlers);
+
 
   if (!possibleMoves.length) {
     const mapGameStateToValue: Record<string, number> = {
@@ -177,9 +177,6 @@ export function getAllMoves(
       }
     }
   }
-
-
-
   return output;
 }
 

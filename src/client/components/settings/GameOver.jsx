@@ -32,7 +32,6 @@ const GameOver = ({ gameOver }) => {
             style={{ backgroundColor: `dark${theme}` }}
             onClick={() => dispatch(resetGame())}
           >Play again</button>
-          <button onClick={() => console.log(state)}>test</button>
         </div>
       </div>
     </div>

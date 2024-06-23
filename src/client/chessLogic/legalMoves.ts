@@ -37,8 +37,12 @@ export function getMoves(
       break;
   }
 
-  // filter out moves that endanger the king
+  // filter out moves and captures that endanger the king
   output.moves = output.moves.filter((move) => {
+    const updatedBoard: board = updateBoard(boardState, selectedSquare, move, currentPlayer);
+    return !isInCheck(updatedBoard, currentPlayer);
+  })
+  output.captures = output.captures.filter((move) => {
     const updatedBoard: board = updateBoard(boardState, selectedSquare, move, currentPlayer);
     return !isInCheck(updatedBoard, currentPlayer);
   })
@@ -88,7 +92,7 @@ export function isInCheck(boardState: board, currentPlayer: player): boolean {
           if (capturableSquares.some(([a, b]) => a === kingRow && b === kingColumn)) return true;
           break;
         case 'p':
-          capturableSquares = pawnMoves(boardState, [i, j], currentPlayer === 'w' ? 'b' : 'w').captures;
+          capturableSquares = pawnMoves(boardState, [i, j], currentPlayer === 'w' ? 'b' : 'w', false).captures;
           if (capturableSquares.some(([a, b]) => a === kingRow && b === kingColumn)) return true;
           break;
         default:
@@ -100,33 +104,31 @@ export function isInCheck(boardState: board, currentPlayer: player): boolean {
   return false
 }
 
-export function noLegalMoves( 
-  boardState: board, 
-  currentPlayer: player, 
-  pawnJumpPrevious?: coordinate
+export function noLegalMoves(
+  boardState: board,
+  currentPlayer: player,
+  pawnJumpPrevious?: coordinate | false
 ): boolean {
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        if (boardState[i][j] !== '-' && boardState[i][j][1] === currentPlayer) {
-          const possibleMoves: moves = getMoves(boardState, [i, j], currentPlayer, pawnJumpPrevious);
-          if (possibleMoves.moves.length || possibleMoves.captures.length) return false;
-        }
-      }
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+      const possibleMoves: moves = getMoves(boardState, [i, j], currentPlayer, pawnJumpPrevious);
+      if (possibleMoves.moves.length || possibleMoves.captures.length) return false;
     }
-    return true;
+  }
+  return true;
 }
 
-export function isGameOver( 
-  boardState: board, 
-  currentPlayer: player, 
+export function isGameOver(
+  boardState: board,
+  currentPlayer: player,
   pawnJumpPrevious: coordinate | false
 ): gameState {
   if (
-    isInCheck(boardState, currentPlayer) 
+    isInCheck(boardState, currentPlayer)
     && noLegalMoves(boardState, currentPlayer, pawnJumpPrevious)
   ) return currentPlayer === 'w' ? 'b' : 'w'
   if (
-    !isInCheck(boardState, currentPlayer) 
+    !isInCheck(boardState, currentPlayer)
     && noLegalMoves(boardState, currentPlayer, pawnJumpPrevious)
   ) return 'sm'
   return false;
@@ -145,12 +147,12 @@ export function getPawnJumpPrevious(
     && nextRow === (currentPlayer === 'w' ? 3 : 4)
   ) return [nextRow, nextColumn];
   return false;
-  
+
 }
 
 export function updateBoard(
-  currentBoard: board, 
-  [previousRow, previousColumn]: coordinate, 
+  currentBoard: board,
+  [previousRow, previousColumn]: coordinate,
   [nextRow, nextColumn]: coordinate,
   currentPlayer: player
 ): board {
@@ -181,20 +183,20 @@ export function updateBoard(
     newBoard[previousRow][0] = '-';
     newBoard[previousRow][3] = `r${currentPlayer}`;
   }
-  
+
   newBoard[nextRow][nextColumn] = currentBoard[previousRow][previousColumn];
   newBoard[previousRow][previousColumn] = '-';
   return newBoard;
 }
 
 export function updateCastlingOptions(
-  previousCastlers: movedCastlers, 
+  previousCastlers: movedCastlers,
   boardState: board,
   previousSquare: coordinate,
   nextSquare: coordinate,
   currentPlayer: player
 ): movedCastlers {
-  const newMovedCastlers: movedCastlers = {...previousCastlers}
+  const newMovedCastlers: movedCastlers = { ...previousCastlers }
 
   const currentPiece: piece = boardState[previousSquare[0]][previousSquare[1]];
   const capturedPiece: piece = boardState[nextSquare[0]][nextSquare[1]];
@@ -202,22 +204,22 @@ export function updateCastlingOptions(
 
   if (currentPiece[0] === 'k') newMovedCastlers[`k${currentPlayer}`] = true;
   if (
-    currentPiece[0] === 'r' 
+    currentPiece[0] === 'r'
     && previousSquare[0] === (currentPlayer === 'w' ? 0 : 7)
     && previousSquare[1] === 0
   ) newMovedCastlers[`r${currentPlayer}0`] = true;
   if (
-    currentPiece[0] === 'r' 
+    currentPiece[0] === 'r'
     && previousSquare[0] === (currentPlayer === 'w' ? 0 : 7)
     && previousSquare[1] === 7
   ) newMovedCastlers[`r${currentPlayer}7`] = true;
   if (
-    capturedPiece[0] === 'r' 
+    capturedPiece[0] === 'r'
     && nextSquare[0] === (currentPlayer === 'w' ? 7 : 0)
     && nextSquare[1] === 7
   ) newMovedCastlers[`r${opponent}7`] = true;
   if (
-    capturedPiece[0] === 'r' 
+    capturedPiece[0] === 'r'
     && nextSquare[0] === (currentPlayer === 'w' ? 7 : 0)
     && nextSquare[1] === 0
   ) newMovedCastlers[`r${opponent}0`] = true;
@@ -280,7 +282,7 @@ export function pawnMoves(
   boardState: board,
   selectedSquare: coordinate,
   currentPlayer: player,
-  pawnJumpPrevious?: coordinate
+  pawnJumpPrevious: coordinate | false
 ): moves {
   const output: moves = { moves: [], captures: [] }
   const row: number = selectedSquare[0];
@@ -455,7 +457,7 @@ export function kingMoves(
   boardState: board,
   selectedSquare: coordinate,
   currentPlayer: player,
-  movedCastlers?: Record<string, boolean>
+  movedCastlers?: movedCastlers
 ): moves {
   const output: moves = { moves: [], captures: [] }
   const row: number = selectedSquare[0];
@@ -480,25 +482,25 @@ export function kingMoves(
   });
 
   //handle castling
-  if (movedCastlers && !movedCastlers['k' + currentPlayer] && !isInCheck(boardState, currentPlayer)) {
+  if (movedCastlers && !movedCastlers[`k${currentPlayer}`] && !isInCheck(boardState, currentPlayer)) {
     // intermediate positions
     const boardClone: board = JSON.parse(JSON.stringify(boardState));
     boardClone[row][column] = '-';
     boardClone[row][5] = `k${currentPlayer}`;
-    
+
     // kingside
     if (
-      !movedCastlers['r' + currentPlayer + '7']
+      !movedCastlers[`r${currentPlayer}7`]
       && boardState[row][5] === '-'
       && boardState[row][6] === '-'
       && !isInCheck(boardClone, currentPlayer)
     ) output.moves.push([row, 6]);
-    
+
     //queenside
     boardClone[row][5] = '-';
     boardClone[row][3] = `k${currentPlayer}`;
     if (
-      !movedCastlers['r' + currentPlayer + '0']
+      !movedCastlers[`r${currentPlayer}0`]
       && boardState[row][1] === '-'
       && boardState[row][2] === '-'
       && boardState[row][3] === '-'
@@ -509,4 +511,13 @@ export function kingMoves(
   return output;
 }
 
-
+const emptyBoard: board = [
+  ['-', '-', '-', '-', '-', '-', '-', '-'],
+  ['-', '-', '-', '-', '-', '-', '-', '-'],
+  ['-', '-', '-', '-', '-', '-', '-', '-'],
+  ['-', '-', '-', '-', '-', '-', '-', '-'],
+  ['-', '-', '-', '-', '-', '-', '-', '-'],
+  ['-', '-', '-', '-', '-', '-', '-', '-'],
+  ['-', '-', '-', '-', '-', '-', '-', '-'],
+  ['-', '-', '-', '-', '-', '-', '-', '-'],
+]

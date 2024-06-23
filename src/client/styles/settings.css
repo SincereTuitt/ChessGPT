@@ -19,7 +19,8 @@
 
 #gameOver {
   position: absolute;
-  width: 80vh;
+  width: 100cqw;
+  overflow: clip;
   aspect-ratio: 1;
   padding: 20cqmin;
   box-sizing: border-box;

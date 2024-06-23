@@ -5,12 +5,7 @@ import SettingsContainer from "./settings/SettingsContainer.jsx";
 const GameContainer = () => {
 
   return (
-    <div style={{
-      display: "flex", 
-      flexDirection: "row", 
-      justifyContent: "space-around",
-      alignItems: "center"
-      }}>
+    <div id="gameContainer">
       <Board />
       <SettingsContainer />
     </div>

@@ -1,4 +1,4 @@
-import { calculateMaterial, chooseBestOption, getAllMoves, getEngineMove, getNodeScore } from "../engine";
+import { calculateMaterial, chooseBestOption, getAllMoves, getEngineMove, getNodeScore } from "../engine.ts";
 import { board, option, piece } from "../types";
 const initialBoard: board = [
   ['rw', 'nw', 'bw', 'qw', 'kw', 'bw', 'nw', 'rw'],
@@ -30,7 +30,7 @@ const options: option[] = [
   },
   {
     move: [[1, 1], [1, 2]],
-    score: 0,
+    score: -50,
     boardState: initialBoard
   },
   {
@@ -50,10 +50,10 @@ describe('calculateMaterial', (): void => {
   })
 })
 describe('chooseBestOption', (): void => {
-  it('should return the best option for white', () => {
+  it('should return the best option', () => {
     expect(chooseBestOption('w', options)).toEqual([[0, 0], [4, 4]]);
   })
-  it('should return the best option for black', () => {
+  it('should always choose checkmate (+/- infinity)', () => {
     expect(chooseBestOption('b', options)).toEqual([[3, 4], [4, 4]]);
   })
 })
@@ -89,6 +89,13 @@ describe('getEngineMove', (): void => {
     board[0][0] = 'kw';
     board[1][7] = 'rb';
     board[2][6] = 'rb';
+    expect(getEngineMove(1, 'b', board, cannotCastle, false)).toEqual([[2, 6], [0, 6]]);
+  })
+  it('should choose checkmate over material', (): void => {
+    board[0][0] = 'kw';
+    board[1][7] = 'rb';
+    board[2][6] = 'rb';
+    board[2][7] = 'rw';
     expect(getEngineMove(1, 'b', board, cannotCastle, false)).toEqual([[2, 6], [0, 6]]);
   })
 })
