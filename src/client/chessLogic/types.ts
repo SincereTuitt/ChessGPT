@@ -18,3 +18,10 @@ export interface option {
   move: move,
   boardState: board
 };
+export type engineFunc = (
+  depth: number,
+  currentPlayer: player,
+  boardState: board,
+  movedCastlers: movedCastlers,
+  pawnJumpPrevious: coordinate | false,
+) => move;
