@@ -65,7 +65,11 @@ const Board = () => {
 
 	useEffect(() => {
 		const worker = new Worker(new URL('../../worker.js', import.meta.url));
-		if (!isTwoPlayer && currentPlayer !== playerColor) {
+		if (
+			!isTwoPlayer 
+			&& currentPlayer !== playerColor
+			&& !gameOver
+		) {
 			makeEngineMove(worker);
 		}
 		return () => {
