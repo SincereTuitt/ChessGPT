@@ -16,7 +16,8 @@ const initialState = {
 	potentialMoves: { moves: [], captures: [] },
 	isTwoPlayer: true,
 	pawnJumpedLastTurn: false, // set to coordinate of pawn that moves two squares
-	movedCastlers: { rb0: false, rb7: false, kb: false, rw0: false, rw7: false, kw: false }
+	movedCastlers: { rb0: false, rb7: false, kb: false, rw0: false, rw7: false, kw: false },
+	gameOver: false // can be w (white wins), b (black wins), sm (stalemate), 3mr(3 move rep), 50mr(50 moves)
 };
 
 export const boardSlice = createSlice({
@@ -40,9 +41,15 @@ export const boardSlice = createSlice({
 		},
 		setMovedCastlers: (state, action) => {
 			state.movedCastlers = action.payload;
+		},
+		setGameOver: (state, action) => {
+			state.gameOver = action.payload;
+		},
+		resetGame: (state) => {
+			return initialState;
 		}
 	}
 });
 
-export const { selectSquare, setPotentialMoves, setNewBoard, switchPlayer, setPawnJumpPrevious, setMovedCastlers } = boardSlice.actions;
+export const { selectSquare, setPotentialMoves, setNewBoard, switchPlayer, setPawnJumpPrevious, setMovedCastlers, setGameOver, resetGame } = boardSlice.actions;
 export default boardSlice.reducer;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { selectSquare, setPotentialMoves, setNewBoard, switchPlayer, setPawnJumpPrevious, setMovedCastlers } from "../../reducers/boardReducer";
-import { getMoves, updateBoard, updateCastlingOptions } from "../../chessLogic/legalMoves";
+import { selectSquare, setPotentialMoves, setNewBoard, switchPlayer, setPawnJumpPrevious, setMovedCastlers, setGameOver } from "../../reducers/boardReducer";
+import { getMoves, updateBoard, updateCastlingOptions, isGameOver, getPawnJumpPrevious } from "../../chessLogic/legalMoves";
 
 const Square = ({ piece, colorType, theme, coordinate }) => {
   const selectedSquare = useSelector((state) => state.board.selectedSquare);
@@ -10,6 +10,7 @@ const Square = ({ piece, colorType, theme, coordinate }) => {
   const potentialMoves = useSelector((state) => state.board.potentialMoves);
   const pawnJumpPrevious = useSelector((state) => state.board.pawnJumpedLastTurn);
   const movedCastlers = useSelector((state) => state.board.movedCastlers);
+  const gameOver = useSelector((state) => state.board.gameOver);
 
   const dispatch = useDispatch();
 
@@ -33,16 +34,7 @@ const Square = ({ piece, colorType, theme, coordinate }) => {
   })();
 
   const updateBoardStates = () => {
-    const selectedPiece = boardState[selectedSquare[0]][selectedSquare[1]];
-    function setEnPassantPossible() {
-      if (
-        selectedPiece[0] === 'p'
-        && selectedSquare[0] === (currentPlayer === 'w' ? 1 : 6)
-        && coordinate[0] === (currentPlayer === 'w' ? 3 : 4)
-      ) dispatch(setPawnJumpPrevious(coordinate));
-      else dispatch(setPawnJumpPrevious(false));
-    }
-    setEnPassantPossible();
+    dispatch(setPawnJumpPrevious(getPawnJumpPrevious(boardState, selectedSquare, coordinate, currentPlayer)));
     dispatch(setMovedCastlers(updateCastlingOptions(
       movedCastlers,
       boardState,
@@ -50,10 +42,13 @@ const Square = ({ piece, colorType, theme, coordinate }) => {
       coordinate,
       currentPlayer
     )))
-    dispatch(setNewBoard(updateBoard(boardState, selectedSquare, coordinate, currentPlayer)));
+    const updatedBoard = updateBoard(boardState, selectedSquare, coordinate, currentPlayer)
+    dispatch(setNewBoard(updatedBoard));
     dispatch(selectSquare(null));
     dispatch(setPotentialMoves({moves: [], captures: []}));
     dispatch(switchPlayer());
+    console.log({updatedBoard});
+    dispatch(setGameOver(isGameOver(updatedBoard, currentPlayer === 'w' ? 'b' : 'w', undefined)));
   }
 
   const clickFunction = () => {

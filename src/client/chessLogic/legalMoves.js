@@ -90,6 +90,38 @@ function isInCheck(boardState, currentPlayer) {
     return false;
 }
 exports.isInCheck = isInCheck;
+function noLegalMoves(boardState, currentPlayer, pawnJumpPrevious) {
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            if (boardState[i][j] !== '-' && boardState[i][j][1] === currentPlayer) {
+                const possibleMoves = getMoves(boardState, [i, j], currentPlayer, pawnJumpPrevious);
+                if (possibleMoves.moves.length || possibleMoves.captures.length)
+                    return false;
+            }
+        }
+    }
+    return true;
+}
+exports.noLegalMoves = noLegalMoves;
+function isGameOver(boardState, currentPlayer, pawnJumpPrevious) {
+    if (isInCheck(boardState, currentPlayer)
+        && noLegalMoves(boardState, currentPlayer, pawnJumpPrevious))
+        return currentPlayer === 'w' ? 'b' : 'w';
+    if (!isInCheck(boardState, currentPlayer)
+        && noLegalMoves(boardState, currentPlayer, pawnJumpPrevious))
+        return 'sm';
+    return false;
+}
+exports.isGameOver = isGameOver;
+function getPawnJumpPrevious(boardState, [previousRow, previousColumn], [nextRow, nextColumn], currentPlayer) {
+    const piece = boardState[previousRow][previousColumn];
+    if (piece[0] === 'p'
+        && previousRow === (currentPlayer === 'w' ? 1 : 6)
+        && nextRow === (currentPlayer === 'w' ? 3 : 4))
+        return [nextRow, nextColumn];
+    return false;
+}
+exports.getPawnJumpPrevious = getPawnJumpPrevious;
 function updateBoard(currentBoard, [previousRow, previousColumn], [nextRow, nextColumn], currentPlayer) {
     const newBoard = JSON.parse(JSON.stringify(currentBoard));
     const currentPiece = currentBoard[previousRow][previousColumn][0];

@@ -1,15 +1,6 @@
-# 🚀 Welcome to your new awesome project!
+##@TODO, in order of importance
 
-This project has been created using **webpack-cli**, you can now run
-
-```
-npm run build
-```
-
-or
-
-```
-yarn build
-```
-
-to bundle your application
+* engine
+* Promotion
+* 3 move repetition
+* 50 move rule

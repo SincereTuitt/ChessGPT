@@ -1,11 +1,11 @@
-import { board, coordinate, moves, piece, player, movedCastlers } from './types';
+import { board, coordinate, moves, piece, player, movedCastlers, gameState } from './types';
 
 export function getMoves(
   boardState: board,
   selectedSquare: coordinate,
   currentPlayer: player,
-  pawnJumpPrevious?: coordinate,
-  movedCastlers?: Record<string, boolean>
+  pawnJumpPrevious?: coordinate | false,
+  movedCastlers?: movedCastlers
 ): moves {
 
   const selectedPiece: piece = boardState[selectedSquare[0]][selectedSquare[1]];
@@ -45,7 +45,6 @@ export function getMoves(
 
   return output;
 }
-
 
 export function isInCheck(boardState: board, currentPlayer: player): boolean {
   // find king location
@@ -99,6 +98,54 @@ export function isInCheck(boardState: board, currentPlayer: player): boolean {
   }
 
   return false
+}
+
+export function noLegalMoves( 
+  boardState: board, 
+  currentPlayer: player, 
+  pawnJumpPrevious?: coordinate
+): boolean {
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (boardState[i][j] !== '-' && boardState[i][j][1] === currentPlayer) {
+          const possibleMoves: moves = getMoves(boardState, [i, j], currentPlayer, pawnJumpPrevious);
+          if (possibleMoves.moves.length || possibleMoves.captures.length) return false;
+        }
+      }
+    }
+    return true;
+}
+
+export function isGameOver( 
+  boardState: board, 
+  currentPlayer: player, 
+  pawnJumpPrevious: coordinate | false
+): gameState {
+  if (
+    isInCheck(boardState, currentPlayer) 
+    && noLegalMoves(boardState, currentPlayer, pawnJumpPrevious)
+  ) return currentPlayer === 'w' ? 'b' : 'w'
+  if (
+    !isInCheck(boardState, currentPlayer) 
+    && noLegalMoves(boardState, currentPlayer, pawnJumpPrevious)
+  ) return 'sm'
+  return false;
+}
+
+export function getPawnJumpPrevious(
+  boardState: board,
+  [previousRow, previousColumn]: coordinate,
+  [nextRow, nextColumn]: coordinate,
+  currentPlayer: player
+): coordinate | false {
+  const piece: piece = boardState[previousRow][previousColumn];
+  if (
+    piece[0] === 'p'
+    && previousRow === (currentPlayer === 'w' ? 1 : 6)
+    && nextRow === (currentPlayer === 'w' ? 3 : 4)
+  ) return [nextRow, nextColumn];
+  return false;
+  
 }
 
 export function updateBoard(

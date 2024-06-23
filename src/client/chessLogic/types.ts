@@ -10,4 +10,11 @@ export interface movedCastlers {
   rw0: boolean, 
   rw7: boolean, 
   kw: boolean
-}
+};
+export type gameState = 'w' | 'b' | 'sm' | '3mr' | '50mr' | false;
+export type move = [coordinate, coordinate];
+export interface option {
+  score: number,
+  move: move,
+  boardState: board
+};

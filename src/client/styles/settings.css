@@ -17,9 +17,35 @@
   margin: 0;
 }
 
+#gameOver {
+  position: absolute;
+  width: 80vh;
+  aspect-ratio: 1;
+  padding: 20cqmin;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#gameOver div{
+  background-color: gray;
+  border: 3px solid black;
+  border-radius: 5%;
+  overflow: hidden;
+  margin: 0px
+}
+
+#gameOver button {
+  width: 80%;
+  color: white;
+  font-size: large;
+  margin-bottom: 10px;
+  aspect-ratio: 4;
+  border-radius: 5% / 10%;
+}
+
 .settingSelected {
   background-color: black;
-  height: 15px;
+  height: 15px; 
   width: 15px;
   border-radius: 100%;
 }

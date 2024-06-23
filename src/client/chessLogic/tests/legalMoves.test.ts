@@ -1,4 +1,4 @@
-import { rookMoves, knightMoves, bishopMoves, kingMoves, queenMoves, pawnMoves, getMoves, isInCheck, updateBoard, updateCastlingOptions } from "../legalMoves.ts";
+import { rookMoves, knightMoves, bishopMoves, kingMoves, queenMoves, pawnMoves, getMoves, isInCheck, updateBoard, updateCastlingOptions, noLegalMoves, isGameOver, getPawnJumpPrevious } from "../legalMoves.ts";
 import { board, coordinate, moves, piece, player } from '../types';
 
 const initialBoard: board = [
@@ -414,3 +414,71 @@ describe ('pawnMoves', (): void => {
     expect(moves.captures).toHaveLength(1);
   })
 }) 
+describe ('noLegalMoves', (): void => {
+  let board;
+  beforeEach(() => board = JSON.parse(JSON.stringify(emptyBoard)));
+  it('should return true if player is checkmated', (): void => {
+    board[0][0] = 'kw';
+    board[0][5] = 'rb';
+    board[1][6] = 'rb'; 
+    expect(noLegalMoves(board, 'w', undefined)).toBe(true);
+  })
+  it('should return true if player is stalemated', (): void => {
+    board[0][0] = 'kw';
+    board[6][1] = 'rb';
+    board[1][6] = 'rb'; 
+    expect(noLegalMoves(board, 'w', undefined)).toBe(true);
+  })
+  it('should return false if the player is in check but can block', (): void => {
+    board[0][0] = 'kw';
+    board[0][5] = 'rb';
+    board[1][6] = 'rb'; 
+    board[1][3] = 'nw';
+    expect(noLegalMoves(board, 'w', undefined)).toBe(false);
+  })
+  it ('should return false if the player is in check but can move the king', (): void => {
+    board[0][0] = 'kw';
+    board[0][5] = 'rb';
+    expect(noLegalMoves(board, 'w', undefined)).toBe(false);
+  })
+})
+describe('getPawnJumpPrevious', (): void => {
+  let board: board;
+  beforeEach(() => board = JSON.parse(JSON.stringify(emptyBoard)));
+  it('should return false if a piece other than a pawn moves', (): void => {
+    board[1][0] = 'qw';
+    expect(getPawnJumpPrevious(board, [1, 0], [3, 0], 'w')).toBe(false);
+  })
+  it('should return false if a pawn moves only one square', (): void => {
+    board[1][0] = 'pw';
+    expect(getPawnJumpPrevious(board, [1, 0], [2, 0], 'w')).toBe(false);
+  })
+  it('should return a coordinate if a pawn advances two squares', (): void => {
+    board[1][0] = 'pw';
+    expect(getPawnJumpPrevious(board, [1, 0], [3, 0], 'w')).toEqual([3, 0]);
+  })
+})
+describe ('isGameOver', (): void => {
+  it('should return false if there are legal moves', (): void => {
+    const board = JSON.parse(JSON.stringify(initialBoard));
+    expect(isGameOver(initialBoard, 'w', undefined)).toBe(false);
+  })
+  it('should return "w" or "b" if a player has won', (): void => {
+    const board = JSON.parse(JSON.stringify(emptyBoard));
+    board[0][0] = 'kw';
+    board[0][5] = 'rb';
+    board[1][6] = 'rb'; 
+    expect(isGameOver(board, 'w', undefined)).toBe('b');
+    board[0][0] = 'kb';
+    board[0][5] = 'rw';
+    board[1][6] = 'rw'; 
+    expect(isGameOver(board, 'b', undefined)).toBe('w');
+  })
+  it('should return "sm" if the game is stalemated', (): void => {
+    const board = JSON.parse(JSON.stringify(emptyBoard));
+    board[0][0] = 'kw';
+    board[6][1] = 'rb';
+    board[1][6] = 'rb'; 
+    expect(isGameOver(board, 'w', undefined)).toBe('sm');
+  })
+})

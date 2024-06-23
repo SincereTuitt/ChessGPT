@@ -1,7 +1,8 @@
 import React from "react";
 import { useEffect } from 'react';
 import { useSelector } from "react-redux";
-import Row from './Row.jsx'
+import Row from './Row.jsx';
+import GameOver from "../settings/GameOver.jsx";
 import '../../styles/board.css'
 
 
@@ -9,6 +10,7 @@ const Board = () => {
 	const theme = useSelector((state) => state.settings.theme);
 	const isTwoPlayer = useSelector((state) => state.board.isTwoPlayer);
 	const currentPlayer = useSelector((state) => state.board.currentPlayer);
+	const gameOver = useSelector((state) => state.board.gameOver);
 	const boardState = useSelector((state) => state.board);
 	const currentPosition = boardState.board;
 
@@ -17,7 +19,7 @@ const Board = () => {
 	})()
 
 
-	return (
+	return ( 
 		<div id='board' style={
 			isBoardFlipped ? {flexDirection: "column"} : {}
 		}>
@@ -30,6 +32,7 @@ const Board = () => {
 					isBoardFlipped={isBoardFlipped}
 				/>
 			))}
+			<GameOver gameOver={gameOver}/>
 		</div>
 	)
 };
