@@ -1,4 +1,5 @@
 # ChessGPT
+![Image](src/client/assets/screenshot.png)
 
 ## Table of contents
 * [Introduction](#introduction)
