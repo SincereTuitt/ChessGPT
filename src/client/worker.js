@@ -1,5 +1,4 @@
-/* this file handles expensive functions that would block the UI, namely 
-calculating engine moves */
+/* this file handles expensive functions that would block the thread of the UI, namely calculating engine moves */
 
 import { getEngineMove } from "./chessLogic/engine";
 

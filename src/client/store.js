@@ -4,7 +4,7 @@ import settingsReducer from "./reducers/settingsReducer"
 
 export const store = configureStore({
   reducer: {
-    board: boardReducer ,
+    board: boardReducer,
     settings: settingsReducer
   },
 })

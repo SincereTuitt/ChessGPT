@@ -1,9 +1,14 @@
 import React from "react";
 import GameContainer from "./GameContainer.jsx";
+import Title from "./Title.jsx";
 
 const App = () => {
+
   return (
-    <GameContainer />
+    <div>
+      <Title />
+      <GameContainer />
+    </div>
   )
 }
 

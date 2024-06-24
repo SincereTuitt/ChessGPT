@@ -1,7 +1,7 @@
 import {getEngineMove} from "../engine";
 import { board, engineFunc } from "../types";
 
-// These the only value that should be changed
+// These are the only value that should be changed
 const engines = [getEngineMove];
 const depth = 1;
 const rounds = 5;

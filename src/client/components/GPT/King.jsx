@@ -115,7 +115,7 @@ const King = () => {
         : '-';
 
     try {
-      const response = await fetch(`http://localhost:3000/gpt/${encodeURIComponent(playerMoveInfo)}/${encodeURIComponent(engineMoveInfo)}`);
+      const response = await fetch(`${process.env.HOST}/gpt/${encodeURIComponent(playerMoveInfo)}/${encodeURIComponent(engineMoveInfo)}`);
       if (!response.ok) throw new Error();
       setIsLoading(false);
       const responseData = await response.json();

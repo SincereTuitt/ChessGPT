@@ -1,13 +1,12 @@
 import { board, piece, option, player, coordinate, move, gameState, movedCastlers } from './types';
 import { getMoves, updateBoard, isGameOver, getPawnJumpPrevious, updateCastlingOptions } from './legalMoves'
 
-// minimax approach
-// 1. generate the tree of evaluations to the given depth
-//    a. generate all possible moves from a given position, tracking material changes
-//    b. recursive call for each new position
-// 2. once depth is reached or game over, evaluate position
-//    a. current player makes moves to maximize score
-//    b. score is w material - b material OR if stalemate OR +/- infinity if checkmate  
+/* minimax approach 
+The engine is really simple. It uses a recursive minimax algorithm to look ahead to every
+possible board configuration for a given depth. It evaluates the position by checking material
+balance. Draws are evaluated at 0, and checkmates at +/- Infinity. Black will always make the
+move that minimizes the possible score, and white will always move to maximize it.
+*/
 
 export function getEngineMove(
   depth: number,
