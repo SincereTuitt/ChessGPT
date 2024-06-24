@@ -1,10 +1,17 @@
-const express = require('express');
-const app = express();
-const path = require('path');
 require('dotenv').config();
+const express = require('express');
+const path = require('path');
+const cors = require('cors');
+const app = express();
 const PORT = process.env.PORT || 3000;
 
+// require in controller
 const gptController = require('./gptController');
+
+// configure cors
+if (process.env.NODE_ENV === 'development') {
+  app.use(cors({ credentials: true, origin: "http://localhost:8080" }));
+}
 
 // serve static files
 app.get(['/'], (req, res) => {

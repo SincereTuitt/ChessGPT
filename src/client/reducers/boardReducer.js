@@ -17,7 +17,8 @@ const initialState = {
 	pawnJumpedLastTurn: false, // set to coordinate of pawn that moves two squares
 	movedCastlers: { rb0: false, rb7: false, kb: false, rw0: false, rw7: false, kw: false },
 	capturedPieces: {b: [], w: []},
-	gameOver: false // can be w (white wins), b (black wins), sm (stalemate), 3mr(3 move rep), 50mr(50 moves)
+	previousMoves: [], // object contains {move: [[num, num], [num, num]], board: [[board before move was made]]}
+	gameOver: false // can be w (white wins), b (black wins), sm (stalemate), 3fr(3 fold rep), 50mr(50 moves)
 };
 
 export const boardSlice = createSlice({
@@ -47,14 +48,17 @@ export const boardSlice = createSlice({
 			state.capturedPieces.b.concat(b);
 			state.capturedPieces.w.concat(w);
 		},
+		addPreviousMove: (state, action) => {
+			state.previousMoves.push(action.payload);
+		},
 		setGameOver: (state, action) => {
 			state.gameOver = action.payload;
 		},
 		resetGame: () => {
 			return initialState;
-		}
+		},
 	}
 });
 
-export const { selectSquare, setPotentialMoves, setNewBoard, switchPlayer, setPawnJumpPrevious, setMovedCastlers, setGameOver, resetGame, setCapturedPieces } = boardSlice.actions;
+export const { selectSquare, setPotentialMoves, setNewBoard, switchPlayer, setPawnJumpPrevious, setMovedCastlers, setGameOver, resetGame, setCapturedPieces, addPreviousMove } = boardSlice.actions;
 export default boardSlice.reducer;

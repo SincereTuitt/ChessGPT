@@ -4,7 +4,7 @@ const initialState = {
   theme: 'green',
   isTwoPlayer: false,
   playerColor: 'w',
-  engineDepth: 2
+  engineDepth: 1.5
 }
 
 export const settingsSlice = createSlice ({

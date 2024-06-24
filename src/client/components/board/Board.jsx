@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Row from './Row.jsx';
 import GameOver from "../settings/GameOver.jsx";
 import { getPawnJumpPrevious, updateCastlingOptions, updateBoard, isGameOver } from "../../chessLogic/legalMoves.js";
-import { setPawnJumpPrevious, setMovedCastlers, setNewBoard, selectSquare, setPotentialMoves, switchPlayer, setGameOver } from "../../reducers/boardReducer.js";
+import { setPawnJumpPrevious, setMovedCastlers, setNewBoard, selectSquare, setPotentialMoves, switchPlayer, setGameOver, addPreviousMove } from "../../reducers/boardReducer.js";
 import '../../styles/board.css';
 
 
@@ -39,6 +39,10 @@ const Board = () => {
 		dispatch(setPotentialMoves({ moves: [], captures: [] }));
 		dispatch(switchPlayer());
 		dispatch(setGameOver(isGameOver(updatedBoard, currentPlayer === 'w' ? 'b' : 'w', undefined)));
+		dispatch(addPreviousMove({
+			move: [moveFrom, moveTo],
+			board: boardState
+		}))
 	}
 
 	const makeEngineMove = ((worker) => {

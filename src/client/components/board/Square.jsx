@@ -12,6 +12,7 @@ const Square = ({ piece, colorType, theme, coordinate, updateBoardStates }) => {
   const potentialMoves = useSelector((state) => state.board.potentialMoves);
   const pawnJumpPrevious = useSelector((state) => state.board.pawnJumpedLastTurn);
   const movedCastlers = useSelector((state) => state.board.movedCastlers);
+  const previousMoves = useSelector((state) => state.board.previousMoves)
 
   const dispatch = useDispatch();
 
