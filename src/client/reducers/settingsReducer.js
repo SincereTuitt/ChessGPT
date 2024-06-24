@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   theme: 'green',
-  isTwoPlayer: true,
+  isTwoPlayer: false,
   playerColor: 'w',
   engineDepth: 2
 }

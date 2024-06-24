@@ -1,0 +1,21 @@
+#kingContainer {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 1;
+}
+
+#kingContainer img {
+  max-width: 200px;
+  height: auto;
+}
+
+#kingContainer h3 {
+  max-width: 200px;
+  overflow-wrap: break-word;
+}
+
+loading-icon {
+  margin: auto;
+  display: block;
+}

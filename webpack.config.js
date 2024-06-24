@@ -39,10 +39,6 @@ const config = {
                 exclude: /node_modules/,
             },
             {
-                test: /\.s[ac]ss$/i,
-                use: [stylesHandler, 'css-loader', 'postcss-loader', 'sass-loader'],
-            },
-            {
                 test: /\.css$/i,
                 use: [stylesHandler, 'css-loader', 'postcss-loader'],
             },
