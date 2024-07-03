@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { selectSquare, setPotentialMoves } from "../../reducers/boardReducer";
+import PromotionOptions from "./PromotionOptions.jsx";
 import { getMoves } from "../../chessLogic/legalMoves.js";
 
 const Square = ({ piece, colorType, theme, coordinate, updateBoardStates }) => {
@@ -54,6 +55,7 @@ const Square = ({ piece, colorType, theme, coordinate, updateBoardStates }) => {
 
     // if square selected already and clicked square in potentialMoves, update board
     else if (isPotentialSquare || isPotentialCapture) {
+      // if(boardState[selectSquare[0]][selectSquare][1])
       updateBoardStates(selectedSquare, coordinate);
     }
   }
@@ -70,6 +72,13 @@ const Square = ({ piece, colorType, theme, coordinate, updateBoardStates }) => {
       <div className={
         (isPotentialSquare ? 'potentialSquare ' : ' ') + (isPotentialCapture ? 'potentialCapture ' : '')
       }></div>
+      {
+        coordinate[0] === 7 && coordinate[1] === 7
+          ?
+          <PromotionOptions />
+          :
+          ''
+      }
     </button>
   )
 }

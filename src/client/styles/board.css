@@ -25,6 +25,8 @@
 .square {
   flex-grow: 1;
   border-width: 0;
+  container-type: size;
+  padding: 0;
 }
 
 .potentialSquare {
@@ -41,4 +43,30 @@
   height: 35%;
   margin: auto;
   border-radius: 100%;
+}
+
+.promotionOptions {
+  position: absolute;
+  width: 120cqw;
+  aspect-ratio: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  border: 3px solid black;
+  background-color: white;
+  box-sizing: border-box;
+  left: -10%;
+  top: -10%;
+}
+.promotionOptions button {
+  width: 100%;
+  aspect-ratio: 1;
+  border-width: 0;
+  cursor: pointer;
+}
+
+#closePromotion {
+  background-color: rgb(169, 169, 169);
+  font-weight: bolder;
+  aspect-ratio: 5;
 }
