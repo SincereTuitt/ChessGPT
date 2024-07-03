@@ -154,19 +154,20 @@ export function updateBoard(
   currentBoard: board,
   [previousRow, previousColumn]: coordinate,
   [nextRow, nextColumn]: coordinate,
-  currentPlayer: player
+  currentPlayer: player,
+  promotionChoice?: piece
 ): board {
   const newBoard: board = JSON.parse(JSON.stringify(currentBoard));
   const currentPiece = currentBoard[previousRow][previousColumn][0];
 
-  // handle en passant
+  // handle en passant - remove captured pawn from board
   if (
     currentPiece === 'p'
     && currentBoard[nextRow][nextColumn] === '-'
     && previousColumn !== nextColumn
   ) newBoard[currentPlayer === 'w' ? nextRow - 1 : nextRow + 1][nextColumn] = '-';
 
-  // handle castling
+  // handle castling - reposition rook
   if (
     currentPiece === 'k'
     && previousColumn === 4
@@ -184,8 +185,13 @@ export function updateBoard(
     newBoard[previousRow][3] = `r${currentPlayer}`;
   }
 
+  // clear previous square and update next square
   newBoard[nextRow][nextColumn] = currentBoard[previousRow][previousColumn];
   newBoard[previousRow][previousColumn] = '-';
+
+  // handle promotion - promote pawn in new position
+  if (promotionChoice) newBoard[nextRow][nextColumn] = promotionChoice;
+
   return newBoard;
 }
 
@@ -510,14 +516,3 @@ export function kingMoves(
 
   return output;
 }
-
-const emptyBoard: board = [
-  ['-', '-', '-', '-', '-', '-', '-', '-'],
-  ['-', '-', '-', '-', '-', '-', '-', '-'],
-  ['-', '-', '-', '-', '-', '-', '-', '-'],
-  ['-', '-', '-', '-', '-', '-', '-', '-'],
-  ['-', '-', '-', '-', '-', '-', '-', '-'],
-  ['-', '-', '-', '-', '-', '-', '-', '-'],
-  ['-', '-', '-', '-', '-', '-', '-', '-'],
-  ['-', '-', '-', '-', '-', '-', '-', '-'],
-]

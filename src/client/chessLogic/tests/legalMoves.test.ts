@@ -105,6 +105,15 @@ describe('updateBoard', (): void => {
     expect(updatedBoard2[7][2]).toBe('kb');
     expect(updatedBoard2[7][3]).toBe('rb');
   })
+  it('should promote a pawn that moves to the back rank', ():void => {
+    board[6][4] = 'pw';
+    expect(updateBoard(board, [6, 4], [7, 4], 'w', 'nw')[7][4]).toBe('nw');
+  })
+  it('should promote a pawn that captures to move to the back rank', ():void => {
+    board[1][4] = 'pw';
+    board[0][5] = 'qw';
+    expect(updateBoard(board, [1, 4], [0, 5], 'b', 'qb')[0][5]).toBe('qb');
+  })
 })
 describe('updateCastlingOptions', (): void => {
   let board: board;
